@@ -1,0 +1,44 @@
+package backend.controller;
+
+import backend.model.Ticket;
+import backend.service.TicketService;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/tickets")
+@CrossOrigin(origins = "*")
+public class TicketController {
+
+    private final TicketService ticketService;
+
+    public TicketController(TicketService ticketService) {
+        this.ticketService = ticketService;
+    }
+
+    @PostMapping
+    public Ticket createTicket(@RequestBody Ticket ticket) {
+        return ticketService.createTicket(ticket);
+    }
+
+    @GetMapping
+    public List<Ticket> getAllTickets() {
+        return ticketService.getAllTickets();
+    }
+
+    @GetMapping("/{id}")
+    public Ticket getTicketById(@PathVariable String id) {
+        return ticketService.getTicketById(id);
+    }
+
+    @PatchMapping("/{id}/status")
+    public Ticket updateStatus(@PathVariable String id, @RequestBody String status) {
+        return ticketService.updateStatus(id, status);
+    }
+
+    @PatchMapping("/{id}/assign")
+    public Ticket assignTechnician(@PathVariable String id, @RequestBody String technician) {
+        return ticketService.assignTechnician(id, technician);
+    }
+}

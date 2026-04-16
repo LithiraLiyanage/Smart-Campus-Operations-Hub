@@ -20,10 +20,32 @@ public class TicketService {
         this.ticketRepository = ticketRepository;
     }
 
-    // Create Ticket
+    // Create Ticket with Validation
     public Ticket createTicket(Ticket ticket) {
+
+        if (ticket.getTitle() == null || ticket.getTitle().trim().isEmpty()) {
+            throw new RuntimeException("Title is required");
+        }
+
+        if (ticket.getDescription() == null || ticket.getDescription().trim().isEmpty()) {
+            throw new RuntimeException("Description is required");
+        }
+
+        if (ticket.getCategory() == null || ticket.getCategory().trim().isEmpty()) {
+            throw new RuntimeException("Category is required");
+        }
+
+        if (ticket.getPriority() == null || ticket.getPriority().trim().isEmpty()) {
+            throw new RuntimeException("Priority is required");
+        }
+
+        if (ticket.getPreferredContact() == null || ticket.getPreferredContact().trim().isEmpty()) {
+            throw new RuntimeException("Preferred contact is required");
+        }
+
         ticket.setCreatedAt(LocalDateTime.now());
         ticket.setUpdatedAt(LocalDateTime.now());
+
         return ticketRepository.save(ticket);
     }
 
@@ -34,107 +56,103 @@ public class TicketService {
 
     // Get Ticket by ID
     public Ticket getTicketById(String id) {
-        return ticketRepository.findById(id).orElse(null);
+        return ticketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
     }
 
-    // Update Ticket Status
+    // Update Status
     public Ticket updateStatus(String id, String status) {
-        Ticket ticket = ticketRepository.findById(id).orElse(null);
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
 
-        if (ticket != null) {
-            ticket.setStatus(status);
-            ticket.setUpdatedAt(LocalDateTime.now());
-            return ticketRepository.save(ticket);
-        }
+        ticket.setStatus(status);
+        ticket.setUpdatedAt(LocalDateTime.now());
 
-        return null;
+        return ticketRepository.save(ticket);
     }
 
     // Assign Technician
     public Ticket assignTechnician(String id, String technician) {
-        Ticket ticket = ticketRepository.findById(id).orElse(null);
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
 
-        if (ticket != null) {
-            ticket.setAssignedTechnician(technician);
-            ticket.setUpdatedAt(LocalDateTime.now());
-            return ticketRepository.save(ticket);
-        }
+        ticket.setAssignedTechnician(technician);
+        ticket.setUpdatedAt(LocalDateTime.now());
 
-        return null;
+        return ticketRepository.save(ticket);
     }
 
     // Add Comment
     public Ticket addComment(String id, String comment) {
-        Ticket ticket = ticketRepository.findById(id).orElse(null);
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
 
-        if (ticket != null) {
-            ticket.getComments().add(comment);
-            ticket.setUpdatedAt(LocalDateTime.now());
-            return ticketRepository.save(ticket);
+        if (comment == null || comment.trim().isEmpty()) {
+            throw new RuntimeException("Comment cannot be empty");
         }
 
-        return null;
+        ticket.getComments().add(comment);
+        ticket.setUpdatedAt(LocalDateTime.now());
+
+        return ticketRepository.save(ticket);
     }
 
-    // Delete Comment by Index
+    // Delete Comment
     public Ticket deleteComment(String id, int index) {
-        Ticket ticket = ticketRepository.findById(id).orElse(null);
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
 
-        if (ticket != null && ticket.getComments() != null && index >= 0 && index < ticket.getComments().size()) {
-            ticket.getComments().remove(index);
-            ticket.setUpdatedAt(LocalDateTime.now());
-            return ticketRepository.save(ticket);
+        if (index < 0 || index >= ticket.getComments().size()) {
+            throw new RuntimeException("Invalid comment index");
         }
 
-        return null;
+        ticket.getComments().remove(index);
+        ticket.setUpdatedAt(LocalDateTime.now());
+
+        return ticketRepository.save(ticket);
     }
 
     // Update Resolution Notes
     public Ticket updateResolutionNotes(String id, String resolutionNotes) {
-        Ticket ticket = ticketRepository.findById(id).orElse(null);
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
 
-        if (ticket != null) {
-            ticket.setResolutionNotes(resolutionNotes);
-            ticket.setUpdatedAt(LocalDateTime.now());
-            return ticketRepository.save(ticket);
-        }
+        ticket.setResolutionNotes(resolutionNotes);
+        ticket.setUpdatedAt(LocalDateTime.now());
 
-        return null;
+        return ticketRepository.save(ticket);
     }
 
-    // Reject Ticket with Reason
+    // Reject Ticket
     public Ticket rejectTicket(String id, String reason) {
-        Ticket ticket = ticketRepository.findById(id).orElse(null);
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
 
-        if (ticket != null) {
-            ticket.setStatus("REJECTED");
-            ticket.setRejectedReason(reason);
-            ticket.setUpdatedAt(LocalDateTime.now());
-            return ticketRepository.save(ticket);
-        }
+        ticket.setStatus("REJECTED");
+        ticket.setRejectedReason(reason);
+        ticket.setUpdatedAt(LocalDateTime.now());
 
-        return null;
+        return ticketRepository.save(ticket);
     }
 
     // Upload Attachments
     public Ticket uploadAttachments(String id, MultipartFile[] files) throws IOException {
-        Ticket ticket = ticketRepository.findById(id).orElse(null);
 
-        if (ticket == null) {
-            return null;
-        }
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
 
         if (files == null || files.length == 0) {
-            throw new RuntimeException("No files were uploaded");
+            throw new RuntimeException("No files uploaded");
         }
 
-        int currentAttachmentCount = ticket.getAttachments() != null ? ticket.getAttachments().size() : 0;
+        int currentCount = ticket.getAttachments() != null ? ticket.getAttachments().size() : 0;
 
-        if (currentAttachmentCount + files.length > 3) {
-            throw new RuntimeException("Maximum 3 attachments are allowed per ticket");
+        if (currentCount + files.length > 3) {
+            throw new RuntimeException("Maximum 3 attachments allowed");
         }
 
         File uploadDir = new File(System.getProperty("user.dir") + File.separator + "uploads");
+
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
         }
@@ -149,6 +167,7 @@ public class TicketService {
         }
 
         ticket.setUpdatedAt(LocalDateTime.now());
+
         return ticketRepository.save(ticket);
     }
 }

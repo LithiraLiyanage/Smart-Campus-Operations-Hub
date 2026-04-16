@@ -5,6 +5,8 @@ import backend.service.TicketService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/tickets")
@@ -60,5 +62,11 @@ public class TicketController {
     @PatchMapping("/{id}/reject")
     public Ticket rejectTicket(@PathVariable String id, @RequestBody String reason) {
         return ticketService.rejectTicket(id, reason);
+    }
+
+    @PatchMapping("/{id}/attachments")
+    public Ticket uploadAttachments(@PathVariable String id,
+    @RequestParam("files") MultipartFile[] files) throws IOException {
+        return ticketService.uploadAttachments(id, files);
     }
 }

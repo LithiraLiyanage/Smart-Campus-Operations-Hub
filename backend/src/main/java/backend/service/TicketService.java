@@ -124,17 +124,19 @@ public class TicketService {
     }
 
     // Reject Ticket
-    public Ticket rejectTicket(String id, String reason) {
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+    public Ticket rejectTicket(String id, String reason, String role) {
 
-        ticket.setStatus("REJECTED");
-        ticket.setRejectedReason(reason);
-        ticket.setUpdatedAt(LocalDateTime.now());
+    checkRole(role, "ADMIN"); // only ADMIN allowed
 
-        return ticketRepository.save(ticket);
+    Ticket ticket = ticketRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Ticket not found"));
+
+    ticket.setStatus("REJECTED");
+    ticket.setRejectedReason(reason);
+    ticket.setUpdatedAt(java.time.LocalDateTime.now());
+
+    return ticketRepository.save(ticket);
     }
-
     // Upload Attachments
     public Ticket uploadAttachments(String id, MultipartFile[] files) throws IOException {
 
@@ -169,5 +171,19 @@ public class TicketService {
         ticket.setUpdatedAt(LocalDateTime.now());
 
         return ticketRepository.save(ticket);
+    }
+
+    private void checkRole(String role, String... allowedRoles) {
+    if (role == null || role.trim().isEmpty()) {
+        throw new RuntimeException("Role is required");
+    }
+
+    for (String allowed : allowedRoles) {
+        if (allowed.equalsIgnoreCase(role)) {
+            return;
+        }
+    }
+
+    throw new RuntimeException("Access denied for role: " + role);
     }
 }

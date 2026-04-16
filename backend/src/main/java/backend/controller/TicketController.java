@@ -60,8 +60,10 @@ public class TicketController {
     }
 
     @PatchMapping("/{id}/reject")
-    public Ticket rejectTicket(@PathVariable String id, @RequestBody String reason) {
-        return ticketService.rejectTicket(id, reason);
+    public Ticket rejectTicket(@PathVariable String id,
+                           @RequestParam String role,
+                           @RequestBody String reason) {
+    return ticketService.rejectTicket(id, reason, role);
     }
 
     @PatchMapping("/{id}/attachments")

@@ -75,14 +75,17 @@ public class TicketService {
     }
 
     // Assign Technician
-    public Ticket assignTechnician(String id, String technician) {
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+    public Ticket assignTechnician(String id, String technician, String role) {
 
-        ticket.setAssignedTechnician(technician);
-        ticket.setUpdatedAt(LocalDateTime.now());
+    checkRole(role, "TECHNICIAN", "ADMIN");
 
-        return ticketRepository.save(ticket);
+    Ticket ticket = ticketRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Ticket not found"));
+
+    ticket.setAssignedTechnician(technician);
+    ticket.setUpdatedAt(java.time.LocalDateTime.now());
+
+    return ticketRepository.save(ticket);
     }
 
     // Add Comment

@@ -42,8 +42,10 @@ public class TicketController {
     }
 
     @PatchMapping("/{id}/assign")
-    public Ticket assignTechnician(@PathVariable String id, @RequestBody String technician) {
-        return ticketService.assignTechnician(id, technician);
+    public Ticket assignTechnician(@PathVariable String id,
+                               @RequestParam String role,
+                               @RequestBody String technician) {
+    return ticketService.assignTechnician(id, technician, role);
     }
 
     @PostMapping("/{id}/comments")

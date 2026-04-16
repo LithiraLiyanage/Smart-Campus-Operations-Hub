@@ -85,4 +85,17 @@ public class TicketService {
 
     return null;
     }
+
+    public Ticket rejectTicket(String id, String reason) {
+    Ticket ticket = ticketRepository.findById(id).orElse(null);
+
+    if (ticket != null) {
+        ticket.setStatus("REJECTED");
+        ticket.setRejectedReason(reason);
+        ticket.setUpdatedAt(java.time.LocalDateTime.now());
+        return ticketRepository.save(ticket);
+    }
+
+    return null;
+    }
 }

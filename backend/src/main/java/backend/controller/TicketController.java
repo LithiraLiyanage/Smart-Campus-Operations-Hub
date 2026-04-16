@@ -56,4 +56,9 @@ public class TicketController {
     public Ticket updateResolutionNotes(@PathVariable String id, @RequestBody String resolutionNotes) {
         return ticketService.updateResolutionNotes(id, resolutionNotes);
     }
+
+    @PatchMapping("/{id}/reject")
+    public Ticket rejectTicket(@PathVariable String id, @RequestBody String reason) {
+        return ticketService.rejectTicket(id, reason);
+    }
 }

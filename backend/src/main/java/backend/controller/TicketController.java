@@ -51,4 +51,9 @@ public class TicketController {
     public Ticket deleteComment(@PathVariable String id, @PathVariable int index) {
         return ticketService.deleteComment(id, index);
     }
+
+    @PatchMapping("/{id}/resolution")
+    public Ticket updateResolutionNotes(@PathVariable String id, @RequestBody String resolutionNotes) {
+        return ticketService.updateResolutionNotes(id, resolutionNotes);
+    }
 }

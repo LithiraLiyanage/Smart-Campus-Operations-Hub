@@ -73,4 +73,16 @@ public class TicketService {
 
     return null;
     }
+
+    public Ticket updateResolutionNotes(String id, String resolutionNotes) {
+    Ticket ticket = ticketRepository.findById(id).orElse(null);
+
+    if (ticket != null) {
+        ticket.setResolutionNotes(resolutionNotes);
+        ticket.setUpdatedAt(java.time.LocalDateTime.now());
+        return ticketRepository.save(ticket);
+    }
+
+    return null;
+    }
 }

@@ -61,14 +61,17 @@ public class TicketService {
     }
 
     // Update Status
-    public Ticket updateStatus(String id, String status) {
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+    public Ticket updateStatus(String id, String status, String role) {
 
-        ticket.setStatus(status);
-        ticket.setUpdatedAt(LocalDateTime.now());
+    checkRole(role, "TECHNICIAN", "ADMIN");
 
-        return ticketRepository.save(ticket);
+    Ticket ticket = ticketRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Ticket not found"));
+
+    ticket.setStatus(status);
+    ticket.setUpdatedAt(java.time.LocalDateTime.now());
+
+    return ticketRepository.save(ticket);
     }
 
     // Assign Technician

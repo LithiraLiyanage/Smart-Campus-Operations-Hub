@@ -35,8 +35,10 @@ public class TicketController {
     }
 
     @PatchMapping("/{id}/status")
-    public Ticket updateStatus(@PathVariable String id, @RequestBody String status) {
-        return ticketService.updateStatus(id, status);
+    public Ticket updateStatus(@PathVariable String id,
+                           @RequestParam String role,
+                           @RequestBody String status) {
+    return ticketService.updateStatus(id, status, role);
     }
 
     @PatchMapping("/{id}/assign")

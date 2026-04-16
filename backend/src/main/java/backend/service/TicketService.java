@@ -50,5 +50,16 @@ public class TicketService {
     }
 
     return null;
-}
+    }
+
+    public Ticket addComment(String id, String comment) {
+    Ticket ticket = ticketRepository.findById(id).orElse(null);
+
+    if (ticket != null) {
+        ticket.getComments().add(comment);
+        return ticketRepository.save(ticket);
+    }
+
+    return null;
+    }
 }

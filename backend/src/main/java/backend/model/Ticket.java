@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
 
 @Data
 @Document(collection = "tickets")
@@ -28,4 +29,6 @@ public class Ticket {
     private List<String> attachments; // image URLs
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    private List<String> comments = new ArrayList<>();
 }

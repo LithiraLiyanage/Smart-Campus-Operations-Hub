@@ -41,4 +41,9 @@ public class TicketController {
     public Ticket assignTechnician(@PathVariable String id, @RequestBody String technician) {
         return ticketService.assignTechnician(id, technician);
     }
+
+    @PostMapping("/{id}/comments")
+    public Ticket addComment(@PathVariable String id, @RequestBody String comment) {
+        return ticketService.addComment(id, comment);
+    }
 }

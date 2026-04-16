@@ -5,8 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Document(collection = "tickets")
@@ -20,15 +20,17 @@ public class Ticket {
     private String category;
     private String priority;
     private String location;
+    private String preferredContact;
 
-    private String status; // OPEN, IN_PROGRESS, RESOLVED, CLOSED
+    private String status = "OPEN"; // OPEN, IN_PROGRESS, RESOLVED, CLOSED, REJECTED
 
     private String assignedTechnician;
     private String resolutionNotes;
+    private String rejectedReason;
 
-    private List<String> attachments; // image URLs
+    private List<String> attachments = new ArrayList<>();
+    private List<String> comments = new ArrayList<>();
 
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    private List<String> comments = new ArrayList<>();
+    private LocalDateTime updatedAt = LocalDateTime.now();
 }

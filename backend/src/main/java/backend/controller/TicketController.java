@@ -46,4 +46,9 @@ public class TicketController {
     public Ticket addComment(@PathVariable String id, @RequestBody String comment) {
         return ticketService.addComment(id, comment);
     }
+
+    @DeleteMapping("/{id}/comments/{index}")
+    public Ticket deleteComment(@PathVariable String id, @PathVariable int index) {
+        return ticketService.deleteComment(id, index);
+    }
 }

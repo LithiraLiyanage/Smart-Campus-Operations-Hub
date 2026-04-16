@@ -62,4 +62,15 @@ public class TicketService {
 
     return null;
     }
+
+    public Ticket deleteComment(String id, int index) {
+    Ticket ticket = ticketRepository.findById(id).orElse(null);
+
+    if (ticket != null && ticket.getComments().size() > index) {
+        ticket.getComments().remove(index);
+        return ticketRepository.save(ticket);
+    }
+
+    return null;
+    }
 }

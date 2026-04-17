@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AppLayout from './components/layout/AppLayout';
-import ProtectedRoute from './components/auth/ProtectedRoute';
+// import ProtectedRoute from './components/auth/ProtectedRoute';
 
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
@@ -25,9 +25,9 @@ const AppRouter: React.FC = () => {
       <Route
         path="/admin"
         element={
-          <ProtectedRoute allowedRoles={['ADMIN']}>
+          // <ProtectedRoute allowedRoles={['ADMIN']}>
             <AppLayout />
-          </ProtectedRoute>
+          // </ProtectedRoute>
         }
       >
         <Route index element={<div>Admin Dashboard Home. Navigate to Facilities.</div>} />
@@ -40,9 +40,9 @@ const AppRouter: React.FC = () => {
       <Route
         path="/dashboard"
         element={
-          <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+          // <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
             <AppLayout />
-          </ProtectedRoute>
+          // </ProtectedRoute>
         }
       >
         <Route index element={<UserDashboard />} />

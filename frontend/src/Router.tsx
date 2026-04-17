@@ -3,12 +3,16 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import AppLayout from './components/layout/AppLayout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
-// Lazy loading or direct imports - for Vite we can just direct import for simplicity right now
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import FacilitiesModule from './pages/admin/FacilitiesModule';
 import UserDashboard from './pages/user/UserDashboard';
 import Error403 from './pages/Error403';
+
+// Module B — Booking
+import BookingFormPage from './pages/user/BookingFormPage';
+import MyBookingsPage from './pages/user/MyBookingsPage';
+import AdminBookingsPage from './pages/admin/AdminBookingsPage';
 
 const AppRouter: React.FC = () => {
   return (
@@ -28,6 +32,8 @@ const AppRouter: React.FC = () => {
       >
         <Route index element={<div>Admin Dashboard Home. Navigate to Facilities.</div>} />
         <Route path="facilities" element={<FacilitiesModule />} />
+        {/* Module B — Admin Bookings */}
+        <Route path="bookings" element={<AdminBookingsPage />} />
       </Route>
 
       {/* User Routes */}
@@ -41,6 +47,9 @@ const AppRouter: React.FC = () => {
       >
         <Route index element={<UserDashboard />} />
         <Route path="facilities" element={<FacilitiesModule viewOnly />} />
+        {/* Module B — User Bookings */}
+        <Route path="bookings/new" element={<BookingFormPage />} />
+        <Route path="bookings" element={<MyBookingsPage />} />
       </Route>
 
       {/* Fallback */}

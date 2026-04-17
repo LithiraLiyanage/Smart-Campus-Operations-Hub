@@ -1,0 +1,113 @@
+package com.smartcampus.backend.service;
+
+import com.smartcampus.backend.dto.*;
+import com.smartcampus.backend.enums.BookingStatus;
+import com.smartcampus.backend.exception.ConflictException;
+import com.smartcampus.backend.model.Booking;
+import com.smartcampus.backend.repository.BookingRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.*;
+
+@Service
+@RequiredArgsConstructor
+public class BookingService {
+
+    private final BookingRepository bookingRepository;
+
+    // Create a new booking (starts as PENDING)
+    public Booking createBooking(BookingRequestDTO dto) {
+        if (!dto.getEndTime().isAfter(dto.getStartTime())) {
+            throw new IllegalStateException("End time must be after start time");
+        }
+
+        Booking booking = Booking.builder()
+                .resourceId(dto.getResourceId())
+                .userId(dto.getUserId())
+                .purpose(dto.getPurpose())
+                .expectedAttendees(dto.getExpectedAttendees())
+                .startTime(dto.getStartTime())
+                .endTime(dto.getEndTime())
+                .status(BookingStatus.PENDING)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        return bookingRepository.save(booking);
+    }
+
+    // Get all bookings (admin)
+    public List<Booking> getAllBookings() {
+        return bookingRepository.findAll();
+    }
+
+    // Get bookings for a specific user
+    public List<Booking> getUserBookings(String userId) {
+        return bookingRepository.findByUserId(userId);
+    }
+
+    // Get a single booking by ID
+    public Booking getBookingById(String id) {
+        return bookingRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Booking not found: " + id));
+    }
+
+    // Admin approves or rejects a booking
+    public Booking updateBookingStatus(String id, BookingStatusUpdateDTO dto) {
+        Booking booking = getBookingById(id);
+
+        if (booking.getStatus() != BookingStatus.PENDING) {
+            throw new IllegalStateException("Only PENDING bookings can be approved or rejected");
+        }
+
+        if (dto.getStatus() == BookingStatus.APPROVED) {
+            // Check for scheduling conflicts before approving
+            List<Booking> conflicts = bookingRepository.findConflictingBookings(
+                    booking.getResourceId(),
+                    booking.getStartTime(),
+                    booking.getEndTime()
+            );
+            if (!conflicts.isEmpty()) {
+                throw new ConflictException("Resource is already booked for this time slot");
+            }
+        }
+
+        if (dto.getStatus() == BookingStatus.REJECTED && 
+            (dto.getReason() == null || dto.getReason().isBlank())) {
+            throw new IllegalStateException("A reason is required when rejecting a booking");
+        }
+
+        booking.setStatus(dto.getStatus());
+        booking.setAdminReason(dto.getReason());
+        booking.setUpdatedAt(LocalDateTime.now());
+
+        return bookingRepository.save(booking);
+    }
+
+    // User cancels their own approved booking
+    public Booking cancelBooking(String id, String userId) {
+        Booking booking = getBookingById(id);
+
+        if (!booking.getUserId().equals(userId)) {
+            throw new IllegalStateException("You can only cancel your own bookings");
+        }
+
+        if (booking.getStatus() != BookingStatus.APPROVED) {
+            throw new IllegalStateException("Only APPROVED bookings can be cancelled");
+        }
+
+        booking.setStatus(BookingStatus.CANCELLED);
+        booking.setUpdatedAt(LocalDateTime.now());
+        return bookingRepository.save(booking);
+    }
+
+    // Delete a booking (admin only)
+    public void deleteBooking(String id) {
+        if (!bookingRepository.existsById(id)) {
+            throw new NoSuchElementException("Booking not found: " + id);
+        }
+        bookingRepository.deleteById(id);
+    }
+}

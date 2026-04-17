@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getUserBookings, cancelBooking } from "../../api/bookingApi";
-import BookingCard from "../components/BookingCard";
+import BookingCard from "../../components/BookingCard";
 
 export default function MyBookingsPage() {
   const [bookings, setBookings] = useState([]);

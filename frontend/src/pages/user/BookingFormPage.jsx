@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createBooking } from "../api/bookingApi";
+import { createBooking } from "../../api/bookingApi";
 
 export default function BookingFormPage() {
   const [form, setForm] = useState({

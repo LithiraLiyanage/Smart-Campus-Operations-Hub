@@ -50,6 +50,7 @@ const AppRouter: React.FC = () => {
         {/* Module B — User Bookings */}
         <Route path="bookings/new" element={<BookingFormPage />} />
         <Route path="bookings" element={<MyBookingsPage />} />
+        <Route path="bookings/user/:userId" element={<MyBookingsPage />} />
       </Route>
 
       {/* Fallback */}

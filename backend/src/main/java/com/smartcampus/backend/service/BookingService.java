@@ -23,6 +23,23 @@ public class BookingService {
         throw new IllegalStateException("End time must be after start time");
     }
 
+    // Check for conflicts with PENDING and APPROVED bookings
+    List<Booking> conflicts = bookingRepository.findConflictingBookings(
+            dto.getResourceId(),
+            dto.getStartTime(),
+            dto.getEndTime()
+    );
+
+    if (!conflicts.isEmpty()) {
+        throw new ConflictException(
+            "This resource is already booked between " +
+            dto.getStartTime().toLocalTime() + " and " +
+            dto.getEndTime().toLocalTime() +
+            " on " + dto.getStartTime().toLocalDate() +
+            ". Please choose a different time slot."
+        );
+    }
+
     Booking booking = Booking.builder()
             .resourceId(dto.getResourceId())
             .resourceName(dto.getResourceName())
@@ -95,6 +112,29 @@ public class BookingService {
 
     if (booking.getStatus() != BookingStatus.PENDING) {
         throw new IllegalStateException("Only PENDING bookings can be updated");
+    }
+
+    if (!dto.getEndTime().isAfter(dto.getStartTime())) {
+        throw new IllegalStateException("End time must be after start time");
+    }
+
+    // Check conflicts excluding current booking
+    List<Booking> conflicts = bookingRepository.findConflictingBookings(
+            dto.getResourceId(),
+            dto.getStartTime(),
+            dto.getEndTime()
+    ).stream()
+     .filter(b -> !b.getId().equals(id)) // exclude self
+     .toList();
+
+    if (!conflicts.isEmpty()) {
+        throw new ConflictException(
+            "This resource is already booked between " +
+            dto.getStartTime().toLocalTime() + " and " +
+            dto.getEndTime().toLocalTime() +
+            " on " + dto.getStartTime().toLocalDate() +
+            ". Please choose a different time slot."
+        );
     }
 
     booking.setResourceId(dto.getResourceId());

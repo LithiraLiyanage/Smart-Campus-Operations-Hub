@@ -19,24 +19,28 @@ public class BookingService {
 
     // Create a new booking (starts as PENDING)
     public Booking createBooking(BookingRequestDTO dto) {
-        if (!dto.getEndTime().isAfter(dto.getStartTime())) {
-            throw new IllegalStateException("End time must be after start time");
-        }
-
-        Booking booking = Booking.builder()
-                .resourceId(dto.getResourceId())
-                .userId(dto.getUserId())
-                .purpose(dto.getPurpose())
-                .expectedAttendees(dto.getExpectedAttendees())
-                .startTime(dto.getStartTime())
-                .endTime(dto.getEndTime())
-                .status(BookingStatus.PENDING)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
-
-        return bookingRepository.save(booking);
+    if (!dto.getEndTime().isAfter(dto.getStartTime())) {
+        throw new IllegalStateException("End time must be after start time");
     }
+
+    Booking booking = Booking.builder()
+            .resourceId(dto.getResourceId())
+            .resourceName(dto.getResourceName())
+            .userId(dto.getUserId())
+            .userName(dto.getUserName())
+            .purpose(dto.getPurpose())
+            .expectedAttendees(dto.getExpectedAttendees())
+            .specialRequirements(dto.getSpecialRequirements())
+            .contactNumber(dto.getContactNumber())
+            .startTime(dto.getStartTime())
+            .endTime(dto.getEndTime())
+            .status(BookingStatus.PENDING)
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
+
+    return bookingRepository.save(booking);
+}
 
     // Get all bookings (admin)
     public List<Booking> getAllBookings() {

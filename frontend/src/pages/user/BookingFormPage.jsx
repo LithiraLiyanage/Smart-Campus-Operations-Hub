@@ -27,6 +27,13 @@ export default function BookingFormPage() {
     e.preventDefault();
     setLoading(true);
     try {
+      // Format datetime to include seconds
+    const formattedData = {
+      ...form,
+      startTime: form.startTime + ":00",
+      endTime: form.endTime + ":00",
+    };
+    
       await createBooking(form);
       showToast("Booking request submitted successfully!", "success");
       setForm({ resourceId: "", userId: "user123", purpose: "", expectedAttendees: 1, startTime: "", endTime: "" });

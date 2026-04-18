@@ -6,7 +6,7 @@ import { bookingApi } from '../../api/bookingApi';
 import { useAuthStore } from '../../store/authStore';
 import dayjs from 'dayjs';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 const { RangePicker } = TimePicker;
 
 const UserFacilityCatalogue: React.FC = () => {
@@ -109,7 +109,7 @@ const UserFacilityCatalogue: React.FC = () => {
       const values = form.getFieldsValue();
       const payload = {
         facilityId: selectedFacility!.id!,
-        userId: user!.id,
+        userId: user!.username,
         date: values.date.format('YYYY-MM-DD'),
         startTime: values.timeRange[0].format('HH:mm:ss'),
         endTime: values.timeRange[1].format('HH:mm:ss'),
@@ -158,8 +158,7 @@ const UserFacilityCatalogue: React.FC = () => {
           <Col xs={24} sm={8}>
             <InputNumber 
               placeholder="Min Capacity" 
-              style={{ width: '100%' }} 
-              onChange={val => setCapacityFilter(val || undefined)} 
+              onChange={val => setCapacityFilter(val ? Number(val) : undefined)} 
             />
           </Col>
         </Row>

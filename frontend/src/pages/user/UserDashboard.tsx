@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Card, Typography, Skeleton, Statistic } from 'antd';
 import { AppstoreOutlined, CheckCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { resourceApi } from '../../api/resourceApi';
+import { facilityApi } from '../../api/facilityApi';
 
 const { Title } = Typography;
 
@@ -14,7 +14,7 @@ const UserDashboard: React.FC = () => {
       try {
         // Small fake delay for Skeleton effect presentation
         await new Promise(r => setTimeout(r, 800));
-        const resources = await resourceApi.getAll();
+        const resources = await facilityApi.getAll();
         
         const types = new Set(resources.map(r => r.type));
         const available = resources.filter(r => r.status === 'AVAILABLE').length;

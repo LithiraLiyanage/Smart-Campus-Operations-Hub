@@ -4,6 +4,7 @@ import com.smartcampus.backend.model.Booking;
 import com.smartcampus.backend.enums.BookingStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,5 +22,6 @@ public interface BookingRepository extends MongoRepository<Booking, String> {
                                           LocalDateTime endTime);
 
     List<Booking> findByStatus(BookingStatus status);
+    List<Booking> findAllByOrderByCreatedAtDesc();
     
 }

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Input, Modal, Form, Select, InputNumber, Popconfirm, Space, Tag, notification, Typography, Card, Row, Col } from 'antd';
+import { Table, Button, Input, Modal, Form, Select, InputNumber, Popconfirm, Space, Tag, notification, Typography, Card, Row, Col, Tabs } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
-import { resourceApi, type ResourceItem } from '../../api/resourceApi';
+import { facilityApi, type Facility } from '../../api/facilityApi';
+import { bookingApi, type Booking } from '../../api/bookingApi';
 
 const { Title } = Typography;
 
@@ -10,23 +11,23 @@ interface FacilitiesModuleProps {
 }
 
 const FacilitiesModule: React.FC<FacilitiesModuleProps> = ({ viewOnly = false }) => {
-  const [data, setData] = useState<ResourceItem[]>([]);
+  const [data, setData] = useState<Facility[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
+  const [bookingsLoading, setBookingsLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const [capacityFilter, setCapacityFilter] = useState<number | undefined>();
   
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [editingResource, setEditingResource] = useState<ResourceItem | null>(null);
+  const [editingResource, setEditingResource] = useState<Facility | null>(null);
   const [form] = Form.useForm();
   
-  // Real-time validation watch is handled via shouldUpdate in form if needed, unused var removed
-
-  const fetchResources = async () => {
+  const fetchFacilities = async () => {
     setLoading(true);
     try {
-      // Small fake delay to assure loading spinner shows for premium feel
       await new Promise(r => setTimeout(r, 600));
-      const res = await resourceApi.getAll();
+      const res = await facilityApi.getAll();
       setData(res);
     } catch (e) {
       notification.error({ message: 'Failed to fetch facilities' });
@@ -35,11 +36,26 @@ const FacilitiesModule: React.FC<FacilitiesModuleProps> = ({ viewOnly = false })
     }
   };
 
-  useEffect(() => {
-    fetchResources();
-  }, []);
+  const fetchBookings = async () => {
+    setBookingsLoading(true);
+    try {
+      const res = await bookingApi.getAll();
+      setBookings(res);
+    } catch(e) {
+      notification.error({ message: 'Failed to fetch bookings' });
+    } finally {
+      setBookingsLoading(false);
+    }
+  }
 
-  const showModal = (record?: ResourceItem) => {
+  useEffect(() => {
+    fetchFacilities();
+    if (!viewOnly) {
+      fetchBookings();
+    }
+  }, [viewOnly]);
+
+  const showModal = (record?: Facility) => {
     setEditingResource(record || null);
     if (record) {
       form.setFieldsValue(record);
@@ -59,15 +75,15 @@ const FacilitiesModule: React.FC<FacilitiesModuleProps> = ({ viewOnly = false })
       const values = await form.validateFields();
       setSubmitting(true);
       if (editingResource?.id) {
-        await resourceApi.update(editingResource.id, values);
+        await facilityApi.update(editingResource.id, values);
         notification.success({ message: 'Facility updated successfully' });
       } else {
-        await resourceApi.create(values);
+        await facilityApi.create(values);
         notification.success({ message: 'Facility added successfully' });
       }
       setIsModalVisible(false);
       form.resetFields();
-      fetchResources();
+      fetchFacilities();
     } catch (e) {
       notification.error({ message: 'Operation failed. Please try again.' });
     } finally {
@@ -78,9 +94,9 @@ const FacilitiesModule: React.FC<FacilitiesModuleProps> = ({ viewOnly = false })
   const handleDelete = async (id: string) => {
     try {
       setLoading(true);
-      await resourceApi.delete(id);
+      await facilityApi.delete(id);
       notification.success({ message: 'Facility deleted successfully' });
-      fetchResources();
+      fetchFacilities();
     } catch (e) {
       notification.error({ message: 'Failed to delete facility' });
       setLoading(false);
@@ -91,20 +107,20 @@ const FacilitiesModule: React.FC<FacilitiesModuleProps> = ({ viewOnly = false })
     const errors = form.getFieldsError();
     const hasErrors = errors.some(({ errors }) => errors.length > 0);
     const isTouched = form.isFieldsTouched(true);
-    // If editing, data is already populated so consider it touched/valid as base
     return (editingResource || isTouched) && !hasErrors;
   };
 
   const filteredData = data.filter(item => 
-    item.name.toLowerCase().includes(searchText.toLowerCase())
+    item.name.toLowerCase().includes(searchText.toLowerCase()) &&
+    (capacityFilter ? item.capacity >= capacityFilter : true)
   );
 
-  const columns: any[] = [
+  const facilityColumns: any[] = [
     {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      sorter: (a: ResourceItem, b: ResourceItem) => a.name.localeCompare(b.name),
+      sorter: (a: Facility, b: Facility) => a.name.localeCompare(b.name),
     },
     {
       title: 'Type',
@@ -115,7 +131,7 @@ const FacilitiesModule: React.FC<FacilitiesModuleProps> = ({ viewOnly = false })
         { text: 'Hall', value: 'Hall' },
         { text: 'Room', value: 'Room' },
       ],
-      onFilter: (value: any, record: ResourceItem) => record.type === value,
+      onFilter: (value: any, record: Facility) => record.type === value,
       render: (type: string) => {
         let color = type === 'Lab' ? 'purple' : type === 'Hall' ? 'geekblue' : 'cyan';
         return <Tag color={color}>{type}</Tag>;
@@ -125,7 +141,7 @@ const FacilitiesModule: React.FC<FacilitiesModuleProps> = ({ viewOnly = false })
       title: 'Capacity',
       dataIndex: 'capacity',
       key: 'capacity',
-      sorter: (a: ResourceItem, b: ResourceItem) => a.capacity - b.capacity,
+      sorter: (a: Facility, b: Facility) => a.capacity - b.capacity,
     },
     {
       title: 'Location',
@@ -140,7 +156,7 @@ const FacilitiesModule: React.FC<FacilitiesModuleProps> = ({ viewOnly = false })
         { text: 'AVAILABLE', value: 'AVAILABLE' },
         { text: 'NOT AVAILABLE', value: 'NOT_AVAILABLE' },
       ],
-      onFilter: (value: any, record: ResourceItem) => record.status === value,
+      onFilter: (value: any, record: Facility) => record.status === value,
       render: (status: string) => (
         <Tag color={status === 'AVAILABLE' ? 'success' : 'error'}>
           {status.replace('_', ' ')}
@@ -150,11 +166,11 @@ const FacilitiesModule: React.FC<FacilitiesModuleProps> = ({ viewOnly = false })
   ];
 
   if (!viewOnly) {
-    columns.push({
+    facilityColumns.push({
       title: 'Action',
       key: 'action',
       dataIndex: 'id',
-      render: (id: string, record: ResourceItem) => (
+      render: (id: string, record: Facility) => (
         <Space size="middle">
           <Button type="text" icon={<EditOutlined style={{ color: '#4f46e5' }}/>} onClick={() => showModal(record)} />
           <Popconfirm
@@ -172,23 +188,23 @@ const FacilitiesModule: React.FC<FacilitiesModuleProps> = ({ viewOnly = false })
     });
   }
 
-  return (
-    <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-      <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
-        <Col>
-          <Title level={4} style={{ margin: 0, fontWeight: 600 }}>Facilities Directory</Title>
-        </Col>
-        <Col>
-          {!viewOnly && (
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal()} style={{ borderRadius: 6 }}>
-              Add Resource
-            </Button>
-          )}
-        </Col>
-      </Row>
+  const bookingColumns: any[] = [
+    { title: 'Facility ID', dataIndex: 'facilityId', key: 'facilityId' },
+    { title: 'User ID', dataIndex: 'userId', key: 'userId' },
+    { title: 'Date', dataIndex: 'date', key: 'date' },
+    { title: 'Start Time', dataIndex: 'startTime', key: 'startTime' },
+    { title: 'End Time', dataIndex: 'endTime', key: 'endTime' },
+    { 
+      title: 'Status', 
+      dataIndex: 'status', 
+      key: 'status',
+      render: (status: string) => <Tag color={status === 'APPROVED' ? 'green' : 'orange'}>{status}</Tag>
+    }
+  ];
 
-      <Card style={{ borderRadius: 12, padding: 0 }} bodyStyle={{ padding: 0 }}>
-        <div style={{ padding: '20px 24px', borderBottom: '1px solid #f0f0f0' }}>
+  const FacilitiesTab = (
+    <Card style={{ borderRadius: 12, padding: 0 }} bodyStyle={{ padding: 0 }}>
+        <div style={{ padding: '20px 24px', borderBottom: '1px solid #f0f0f0', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
           <Input
             placeholder="Search facilities by name..."
             prefix={<SearchOutlined style={{ color: '#bfbfbf' }}/>}
@@ -197,16 +213,63 @@ const FacilitiesModule: React.FC<FacilitiesModuleProps> = ({ viewOnly = false })
             style={{ maxWidth: 320, borderRadius: 6 }}
             allowClear
           />
+          <InputNumber 
+            placeholder="Min Capacity" 
+            value={capacityFilter} 
+            onChange={val => setCapacityFilter(val || undefined)}
+            style={{ borderRadius: 6 }}
+          />
         </div>
         <Table
-          columns={columns}
+          columns={facilityColumns}
           dataSource={filteredData}
           rowKey={(record) => record.id || record.name}
           loading={loading}
           pagination={{ pageSize: 8 }}
           style={{ padding: '0 24px 24px' }}
         />
+        {filteredData.length === 0 && !loading && (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+             No results found. Try adjusting your filters.
+          </div>
+        )}
       </Card>
+  );
+
+  return (
+    <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+      <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
+        <Col>
+          <Title level={4} style={{ margin: 0, fontWeight: 600 }}>Admin Hub</Title>
+        </Col>
+        <Col>
+          {!viewOnly && (
+            <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal()} style={{ borderRadius: 6 }}>
+              Add Facility
+            </Button>
+          )}
+        </Col>
+      </Row>
+
+      <Tabs defaultActiveKey="1" items={[
+        { key: '1', label: 'Facilities', children: FacilitiesTab },
+        { 
+          key: '2', 
+          label: 'Bookings', 
+          children: (
+            <Card style={{ borderRadius: 12, padding: 0 }} bodyStyle={{ padding: 0 }}>
+               <Table 
+                 columns={bookingColumns} 
+                 dataSource={bookings} 
+                 rowKey="id" 
+                 loading={bookingsLoading}
+                 pagination={{ pageSize: 8 }}
+                 style={{ padding: '24px' }}
+               />
+            </Card>
+          ) 
+        }
+      ]} />
 
       <Modal
         title={editingResource ? "Edit Facility" : "Add New Facility"}

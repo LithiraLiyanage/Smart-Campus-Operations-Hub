@@ -8,6 +8,7 @@ import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import FacilitiesModule from './pages/admin/FacilitiesModule';
 import UserDashboard from './pages/user/UserDashboard';
+import UserFacilityCatalogue from './pages/user/UserFacilityCatalogue';
 import Error403 from './pages/Error403';
 
 const AppRouter: React.FC = () => {
@@ -40,7 +41,7 @@ const AppRouter: React.FC = () => {
         }
       >
         <Route index element={<UserDashboard />} />
-        <Route path="facilities" element={<FacilitiesModule viewOnly />} />
+        <Route path="facilities" element={<UserFacilityCatalogue />} />
       </Route>
 
       {/* Fallback */}

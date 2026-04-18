@@ -4,7 +4,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
-public class ResourceRequest {
+public class FacilityRequest {
 
     @NotBlank(message = "Name is required")
     private String name;

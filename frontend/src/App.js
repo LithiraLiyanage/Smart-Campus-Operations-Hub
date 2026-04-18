@@ -8,6 +8,7 @@ function App() {
   const [location, setLocation] = useState("");
   const [contact, setContact] = useState("");
   const [tickets, setTickets] = useState([]);
+  const [technicianInputs, setTechnicianInputs] = useState({});
 
   const fetchTickets = async () => {
     try {
@@ -23,7 +24,6 @@ function App() {
     fetchTickets();
   }, []);
 
-  // 🔥 NEW FUNCTION: Update Status
   const updateStatus = async (id) => {
     try {
       const response = await fetch(
@@ -46,6 +46,39 @@ function App() {
     } catch (error) {
       console.error(error);
       alert("Error updating status");
+    }
+  };
+
+  const assignTechnician = async (id) => {
+    const technicianName = technicianInputs[id];
+
+    if (!technicianName || technicianName.trim() === "") {
+      alert("Please enter technician name");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:8081/api/tickets/${id}/assign?role=TECHNICIAN`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(technicianName)
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to assign technician");
+      }
+
+      alert("Technician assigned successfully!");
+      setTechnicianInputs((prev) => ({ ...prev, [id]: "" }));
+      fetchTickets();
+    } catch (error) {
+      console.error(error);
+      alert("Error assigning technician");
     }
   };
 
@@ -169,6 +202,23 @@ function App() {
 
             <button onClick={() => updateStatus(ticket.id)}>
               Mark as Resolved
+            </button>
+
+            <br /><br />
+
+            <input
+              type="text"
+              placeholder="Enter technician name"
+              value={technicianInputs[ticket.id] || ""}
+              onChange={(e) =>
+                setTechnicianInputs({
+                  ...technicianInputs,
+                  [ticket.id]: e.target.value
+                })
+              }
+            />
+            <button onClick={() => assignTechnician(ticket.id)}>
+              Assign Technician
             </button>
           </div>
         ))

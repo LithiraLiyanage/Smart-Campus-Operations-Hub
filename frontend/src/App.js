@@ -9,6 +9,7 @@ function App() {
   const [contact, setContact] = useState("");
   const [tickets, setTickets] = useState([]);
   const [technicianInputs, setTechnicianInputs] = useState({});
+  const [commentInputs, setCommentInputs] = useState({});
 
   const fetchTickets = async () => {
     try {
@@ -30,9 +31,7 @@ function App() {
         `http://localhost:8081/api/tickets/${id}/status?role=TECHNICIAN`,
         {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify("RESOLVED")
         }
       );
@@ -62,9 +61,7 @@ function App() {
         `http://localhost:8081/api/tickets/${id}/assign?role=TECHNICIAN`,
         {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(technicianName)
         }
       );
@@ -79,6 +76,37 @@ function App() {
     } catch (error) {
       console.error(error);
       alert("Error assigning technician");
+    }
+  };
+
+  const addComment = async (id) => {
+    const comment = commentInputs[id];
+
+    if (!comment || comment.trim() === "") {
+      alert("Please enter a comment");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:8081/api/tickets/${id}/comments`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(comment)
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to add comment");
+      }
+
+      alert("Comment added successfully!");
+      setCommentInputs((prev) => ({ ...prev, [id]: "" }));
+      fetchTickets();
+    } catch (error) {
+      console.error(error);
+      alert("Error adding comment");
     }
   };
 
@@ -97,9 +125,7 @@ function App() {
     try {
       const response = await fetch("http://localhost:8081/api/tickets", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(ticket)
       });
 
@@ -219,6 +245,34 @@ function App() {
             />
             <button onClick={() => assignTechnician(ticket.id)}>
               Assign Technician
+            </button>
+
+            <br /><br />
+
+            <h4>Comments</h4>
+            {ticket.comments && ticket.comments.length > 0 ? (
+              <ul>
+                {ticket.comments.map((comment, index) => (
+                  <li key={index}>{comment}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>No comments yet.</p>
+            )}
+
+            <input
+              type="text"
+              placeholder="Add a comment"
+              value={commentInputs[ticket.id] || ""}
+              onChange={(e) =>
+                setCommentInputs({
+                  ...commentInputs,
+                  [ticket.id]: e.target.value
+                })
+              }
+            />
+            <button onClick={() => addComment(ticket.id)}>
+              Add Comment
             </button>
           </div>
         ))

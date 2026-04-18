@@ -44,7 +44,7 @@ public class BookingService {
 
     // Get all bookings (admin)
     public List<Booking> getAllBookings() {
-        return bookingRepository.findAll();
+        return bookingRepository.findAllByOrderByCreatedAtDesc();
     }
 
     // Get bookings for a specific user

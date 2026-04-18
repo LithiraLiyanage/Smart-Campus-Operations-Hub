@@ -18,3 +18,6 @@ export const cancelBooking = (id, userId) =>
   axios.patch(`${BASE_URL}/${id}/cancel`, null, { params: { userId } });
 
 export const deleteBooking = (id) => axios.delete(`${BASE_URL}/${id}`);
+
+export const updateBooking = (id, data) =>
+  axios.put(`${BASE_URL}/${id}`, data);

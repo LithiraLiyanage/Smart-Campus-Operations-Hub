@@ -90,6 +90,28 @@ public class BookingService {
         return bookingRepository.save(booking);
     }
 
+    public Booking updateBooking(String id, BookingRequestDTO dto) {
+    Booking booking = getBookingById(id);
+
+    if (booking.getStatus() != BookingStatus.PENDING) {
+        throw new IllegalStateException("Only PENDING bookings can be updated");
+    }
+
+    booking.setResourceId(dto.getResourceId());
+    booking.setResourceName(dto.getResourceName());
+    booking.setUserId(dto.getUserId());
+    booking.setUserName(dto.getUserName());
+    booking.setPurpose(dto.getPurpose());
+    booking.setExpectedAttendees(dto.getExpectedAttendees());
+    booking.setSpecialRequirements(dto.getSpecialRequirements());
+    booking.setContactNumber(dto.getContactNumber());
+    booking.setStartTime(dto.getStartTime());
+    booking.setEndTime(dto.getEndTime());
+    booking.setUpdatedAt(LocalDateTime.now());
+
+    return bookingRepository.save(booking);
+}
+
     // User cancels their own approved booking
     public Booking cancelBooking(String id, String userId) {
         Booking booking = getBookingById(id);

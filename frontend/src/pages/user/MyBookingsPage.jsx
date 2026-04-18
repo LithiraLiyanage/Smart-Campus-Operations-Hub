@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getUserBookings, cancelBooking, deleteBooking } from "../../api/bookingApi";
+import { getUserBookings, cancelBooking, deleteBooking, updateBooking } from "../../api/bookingApi";
 import "./MyBookingsPage.css";
 
 const StatusBadge = ({ status }) => (
@@ -107,9 +107,10 @@ export default function MyBookingsPage() {
       };
 
       // Use PUT endpoint
-      await import("axios").then(({ default: axios }) =>
-        axios.put(`http://localhost:8083/api/bookings/${editBooking.id}`, updatedData)
-      );
+      //await import("axios").then(({ default: axios }) =>
+      //axios.put(`http://localhost:8083/api/bookings/${editBooking.id}`, updatedData)
+      //);
+      await updateBooking(editBooking.id, updatedData);
 
       showToast("Booking updated successfully!", "success");
       handleEditClose();

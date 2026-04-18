@@ -10,6 +10,7 @@ function App() {
   const [tickets, setTickets] = useState([]);
   const [technicianInputs, setTechnicianInputs] = useState({});
   const [commentInputs, setCommentInputs] = useState({});
+  const [fileInputs, setFileInputs] = useState({});
 
   const fetchTickets = async () => {
     try {
@@ -31,7 +32,9 @@ function App() {
         `http://localhost:8081/api/tickets/${id}/status?role=TECHNICIAN`,
         {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json"
+          },
           body: JSON.stringify("RESOLVED")
         }
       );
@@ -61,7 +64,9 @@ function App() {
         `http://localhost:8081/api/tickets/${id}/assign?role=TECHNICIAN`,
         {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json"
+          },
           body: JSON.stringify(technicianName)
         }
       );
@@ -92,7 +97,9 @@ function App() {
         `http://localhost:8081/api/tickets/${id}/comments`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json"
+          },
           body: JSON.stringify(comment)
         }
       );
@@ -107,6 +114,42 @@ function App() {
     } catch (error) {
       console.error(error);
       alert("Error adding comment");
+    }
+  };
+
+  const uploadFiles = async (id) => {
+    const files = fileInputs[id];
+
+    if (!files || files.length === 0) {
+      alert("Please select files");
+      return;
+    }
+
+    const formData = new FormData();
+
+    for (let i = 0; i < files.length; i++) {
+      formData.append("files", files[i]);
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:8081/api/tickets/${id}/attachments`,
+        {
+          method: "PATCH",
+          body: formData
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      alert("Files uploaded successfully!");
+      setFileInputs((prev) => ({ ...prev, [id]: null }));
+      fetchTickets();
+    } catch (error) {
+      console.error(error);
+      alert("Error uploading files");
     }
   };
 
@@ -125,7 +168,9 @@ function App() {
     try {
       const response = await fetch("http://localhost:8081/api/tickets", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify(ticket)
       });
 
@@ -274,6 +319,47 @@ function App() {
             <button onClick={() => addComment(ticket.id)}>
               Add Comment
             </button>
+
+            <br /><br />
+
+            <h4>Upload Attachments</h4>
+            <input
+              type="file"
+              multiple
+              onChange={(e) =>
+                setFileInputs({
+                  ...fileInputs,
+                  [ticket.id]: e.target.files
+                })
+              }
+            />
+            <button onClick={() => uploadFiles(ticket.id)}>
+              Upload Files
+            </button>
+
+            {ticket.attachments && ticket.attachments.length > 0 && (
+              <>
+                <br /><br />
+                <strong>Uploaded Files:</strong>
+                <div style={{ marginTop: "10px" }}>
+                  {ticket.attachments.map((file, index) => (
+                    <div key={index} style={{ marginBottom: "15px" }}>
+                      <p>{file}</p>
+                      <img
+                        src={`http://localhost:8081/${file}`}
+                        alt="attachment"
+                        style={{
+                          width: "200px",
+                          height: "auto",
+                          border: "1px solid #ccc",
+                          borderRadius: "6px"
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         ))
       )}

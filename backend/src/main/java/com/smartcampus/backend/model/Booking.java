@@ -18,9 +18,13 @@ public class Booking {
     private String id;
 
     private String resourceId;       // from Module A
+    private String resourceName;
     private String userId;           // authenticated user's ID
+    private String userName;
     private String purpose;
     private int expectedAttendees;
+    private String specialRequirements;
+    private String contactNumber;
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;

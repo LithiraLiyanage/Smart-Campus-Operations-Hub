@@ -1,104 +1,120 @@
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 .booking-page {
-  min-height: 100vh;
+  height: 100vh;
   background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
   display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 40px 24px;
+  flex-direction: column;
   font-family: 'Segoe UI', sans-serif;
+  overflow: hidden;
 }
 
-.booking-wrapper {
-  width: 100%;
-  max-width: 900px;
-}
-
-.booking-header {
+/* Top header bar */
+.booking-topbar {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 28px;
+  gap: 14px;
+  padding: 16px 40px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  flex-shrink: 0;
 }
 
 .booking-icon {
-  width: 52px;
-  height: 52px;
-  min-width: 52px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
   background: #2563eb;
-  border-radius: 14px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .booking-icon svg {
-  width: 26px;
-  height: 26px;
+  width: 20px;
+  height: 20px;
   stroke: white;
 }
 
-.booking-header-text h1 {
-  font-size: 26px;
+.booking-topbar h1 {
+  font-size: 20px;
   font-weight: 700;
   color: #1e293b;
-  margin: 0 0 4px;
 }
 
-.booking-header-text p {
-  font-size: 14px;
-  color: #64748b;
-  margin: 0;
+.booking-topbar p {
+  font-size: 13px;
+  color: #94a3b8;
+  margin-top: 1px;
+}
+
+/* Main content area */
+.booking-content {
+  flex: 1;
+  padding: 20px 40px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .booking-card {
   background: white;
-  border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.07);
   border: 1px solid #e2e8f0;
-  padding: 36px 40px;
+  padding: 24px 32px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
+
+.booking-card form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 4-column grid */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 12px 20px;
+  flex: 1;
+}
+
+.col-span-2 { grid-column: span 2; }
+.col-span-3 { grid-column: span 3; }
+.col-span-4 { grid-column: span 4; }
 
 /* Section title */
 .form-section-title {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: #2563eb;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin: 28px 0 16px;
-  padding-bottom: 8px;
+  letter-spacing: 0.12em;
+  padding-bottom: 6px;
   border-bottom: 2px solid #eff6ff;
   grid-column: 1 / -1;
+  margin-top: 4px;
 }
 
-/* Grid layout — 3 columns by default */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px 20px;
+.form-section-title:first-child {
+  margin-top: 0;
 }
 
-.form-grid .form-group {
-  margin: 0;
-}
-
-/* Span helpers */
-.col-span-2 { grid-column: span 2; }
-.col-span-3 { grid-column: span 3; }
-
+/* Form group */
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .form-group label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   color: #94a3b8;
   text-transform: uppercase;
@@ -108,10 +124,10 @@
 .form-group input,
 .form-group textarea {
   width: 100%;
-  padding: 11px 14px;
+  padding: 9px 12px;
   border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 13px;
   color: #1e293b;
   background: #f8fafc;
   outline: none;
@@ -123,7 +139,7 @@
 .form-group textarea:focus {
   border-color: #2563eb;
   background: white;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
 }
 
 .form-group input::placeholder,
@@ -132,19 +148,16 @@
 }
 
 .form-group textarea {
-  resize: vertical;
-  min-height: 80px;
+  resize: none;
+  height: 100%;
+  min-height: 60px;
 }
 
-.required {
-  color: #ef4444;
-  margin-left: 2px;
-}
-
+.required { color: #ef4444; margin-left: 2px; }
 .optional {
   color: #94a3b8;
   font-weight: 400;
-  font-size: 11px;
+  font-size: 10px;
   text-transform: none;
   letter-spacing: 0;
 }
@@ -152,17 +165,18 @@
 /* Submit button */
 .submit-btn {
   width: 100%;
-  padding: 14px;
+  padding: 12px;
   background: #2563eb;
   color: white;
   border: none;
-  border-radius: 12px;
-  font-size: 15px;
+  border-radius: 10px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 28px;
+  margin-top: 16px;
+  flex-shrink: 0;
   transition: background 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -171,18 +185,14 @@
 
 .submit-btn:hover {
   background: #1d4ed8;
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
 }
 
-.submit-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* Spinner */
 .spinner {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border: 2px solid rgba(255,255,255,0.4);
   border-top-color: white;
   border-radius: 50%;
@@ -194,16 +204,16 @@
 /* Toast */
 .toast {
   position: fixed;
-  top: 24px;
-  right: 24px;
+  top: 20px;
+  right: 20px;
   z-index: 999;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 14px 20px;
-  border-radius: 12px;
+  padding: 12px 18px;
+  border-radius: 10px;
   color: white;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   box-shadow: 0 8px 24px rgba(0,0,0,0.15);
   animation: slideIn 0.3s ease;
@@ -215,16 +225,4 @@
 @keyframes slideIn {
   from { opacity: 0; transform: translateX(40px); }
   to   { opacity: 1; transform: translateX(0); }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .form-grid { grid-template-columns: 1fr 1fr; }
-  .col-span-3 { grid-column: span 2; }
-  .booking-card { padding: 24px 20px; }
-}
-
-@media (max-width: 480px) {
-  .form-grid { grid-template-columns: 1fr; }
-  .col-span-2, .col-span-3 { grid-column: span 1; }
 }

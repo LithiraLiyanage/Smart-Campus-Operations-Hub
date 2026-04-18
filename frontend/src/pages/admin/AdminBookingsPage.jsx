@@ -128,72 +128,82 @@ export default function AdminBookingsPage() {
               <table className="admin-table">
                 <thead>
                   <tr>
-                    <th>Resource</th>
-                    <th>User</th>
-                    <th>Purpose</th>
-                    <th>Schedule</th>
-                    <th>Attendees</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {bookings.map((b) => (
-                    <tr key={b.id}>
-                      <td>
-                        <div className="resource-id">{b.resourceId}</div>
-                        <div className="time-sub">{b.resourceName}</div>
-                      </td>
-                      <td>
-                        <div style={{ fontWeight: 500, color: "#1e293b" }}>{b.userName || b.userId}</div>
-                        <div className="time-sub">{b.contactNumber}</div>
-                      </td>
-                      <td>{b.purpose}</td>
-                      <td>
-                        <div className="time-main">
-                          {new Date(b.startTime).toLocaleDateString()}
-                        </div>
-                        <div className="time-sub">
-                          {new Date(b.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} →{" "}
-                          {new Date(b.endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                        </div>
-                      </td>
-                      <td>{b.expectedAttendees}</td>
-                      <td><StatusBadge status={b.status} /></td>
-                      <td>
-                        <div className="actions-cell">
-                          {b.status === "PENDING" && (
-                            <>
-                              <div className="action-buttons">
-                                <button className="approve-btn"
-                                  onClick={() => handleApprove(b.id)}
-                                  disabled={actionLoading === b.id + "_approve"}>
-                                  ✓ Approve
-                                </button>
-                                <button className="reject-btn"
-                                  onClick={() => handleReject(b.id)}
-                                  disabled={actionLoading === b.id + "_reject"}>
-                                  ✕ Reject
-                                </button>
-                              </div>
-                              <input className="reason-input" type="text"
-                                placeholder="Rejection reason..."
-                                value={rejectReason[b.id] || ""}
-                                onChange={(e) => setRejectReason({
-                                  ...rejectReason, [b.id]: e.target.value
-                                })}
-                              />
-                            </>
-                          )}
-                          <button className="delete-btn"
-                            onClick={() => handleDelete(b.id)}>
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+                       <th>Resource</th>
+                        <th>User</th>
+                        <th>Purpose</th>
+                       <th>Schedule</th>
+                        <th>Capacity</th>
+                        <th>Contact</th>
+                        <th>Special Requirements</th>
+                       <th>Status</th>
+                       <th>Actions</th>
+                   </tr>
+               </thead>
+  <tbody>
+    {bookings.map((b) => (
+      <tr key={b.id}>
+        <td>
+          <div className="resource-id">{b.resourceId}</div>
+          <div className="time-sub">{b.resourceName}</div>
+        </td>
+        <td>
+          <div style={{ fontWeight: 500, color: "#1e293b" }}>{b.userName || b.userId}</div>
+          <div className="time-sub">{b.userId}</div>
+        </td>
+        <td>{b.purpose}</td>
+        <td>
+          <div className="time-main">
+            {new Date(b.startTime).toLocaleDateString()}
+          </div>
+          <div className="time-sub">
+            {new Date(b.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} →{" "}
+            {new Date(b.endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          </div>
+        </td>
+        <td>{b.expectedAttendees}</td>
+        <td>{b.contactNumber || "—"}</td>
+        <td>{b.specialRequirements || "—"}</td>
+        <td>
+          <StatusBadge status={b.status} />
+          {b.adminReason && (
+            <div className="time-sub" style={{ color: "#ef4444", marginTop: 3 }}>
+              {b.adminReason}
+            </div>
+          )}
+        </td>
+        <td>
+          <div className="actions-cell">
+            {b.status === "PENDING" && (
+              <>
+                <div className="action-buttons">
+                  <button className="approve-btn"
+                    onClick={() => handleApprove(b.id)}
+                    disabled={actionLoading === b.id + "_approve"}>
+                    ✓ Approve
+                  </button>
+                  <button className="reject-btn"
+                    onClick={() => handleReject(b.id)}
+                    disabled={actionLoading === b.id + "_reject"}>
+                    ✕ Reject
+                  </button>
+                </div>
+                <input className="reason-input" type="text"
+                  placeholder="Rejection reason..."
+                  value={rejectReason[b.id] || ""}
+                  onChange={(e) => setRejectReason({
+                    ...rejectReason, [b.id]: e.target.value
+                  })}
+                />
+              </>
+            )}
+            <button className="delete-btn" onClick={() => handleDelete(b.id)}>
+              Delete
+            </button>
+          </div>
+        </td>
+      </tr>
+    ))}
+  </tbody>
               </table>
             </div>
           )}

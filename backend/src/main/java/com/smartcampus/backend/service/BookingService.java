@@ -25,7 +25,7 @@ public class BookingService {
 
     // Check for conflicts with PENDING and APPROVED bookings
     List<Booking> conflicts = bookingRepository.findConflictingBookings(
-            dto.getResourceId(),
+            dto.getResourceId().toUpperCase(),
             dto.getStartTime(),
             dto.getEndTime()
     );
@@ -41,7 +41,7 @@ public class BookingService {
     }
 
     Booking booking = Booking.builder()
-            .resourceId(dto.getResourceId())
+            .resourceId(dto.getResourceId().toUpperCase())
             .resourceName(dto.getResourceName())
             .userId(dto.getUserId())
             .userName(dto.getUserName())
@@ -120,7 +120,7 @@ public class BookingService {
 
     // Check conflicts excluding current booking
     List<Booking> conflicts = bookingRepository.findConflictingBookings(
-            dto.getResourceId(),
+            dto.getResourceId().toUpperCase(),
             dto.getStartTime(),
             dto.getEndTime()
     ).stream()
@@ -137,7 +137,7 @@ public class BookingService {
         );
     }
 
-    booking.setResourceId(dto.getResourceId());
+    booking.setResourceId(dto.getResourceId().toUpperCase());
     booking.setResourceName(dto.getResourceName());
     booking.setUserId(dto.getUserId());
     booking.setUserName(dto.getUserName());

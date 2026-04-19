@@ -1,255 +1,116 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Row, Col, Typography, Input, Select, InputNumber, Button, Modal, DatePicker, TimePicker, Form, notification, Tag, Spin, Alert } from 'antd';
-import { SearchOutlined, EnvironmentOutlined, TeamOutlined, DesktopOutlined, ScheduleOutlined } from '@ant-design/icons';
-import { facilityApi, type Facility } from '../../api/facilityApi';
-import { bookingApi } from '../../api/bookingApi';
-import { useAuthStore } from '../../store/authStore';
-import dayjs from 'dayjs';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import ResourceCard from '../../components/ResourceCatalogue/ResourceCard';
+import ResourceFilterBar from '../../components/ResourceCatalogue/ResourceFilterBar';
+import LoadingSkeleton from '../../components/ResourceCatalogue/LoadingSkeleton';
+import EmptyState from '../../components/ResourceCatalogue/EmptyState';
 
-const { Title } = Typography;
-const { RangePicker } = TimePicker;
+const UserFacilityCatalogue = () => {
+  const [resources, setResources] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-const UserFacilityCatalogue: React.FC = () => {
-  const [facilities, setFacilities] = useState<Facility[]>([]);
-  const [loading, setLoading] = useState(false);
-  
-  const [searchText, setSearchText] = useState('');
-  const [typeFilter, setTypeFilter] = useState<string | undefined>();
-  const [capacityFilter, setCapacityFilter] = useState<number | undefined>();
+  const [filters, setFilters] = useState<any>({
+    search: '',
+    type: '',
+    status: '',
+    capacity: null
+  });
 
-  const [bookingModalVisible, setBookingModalVisible] = useState(false);
-  const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
-  
-  const [checkingAvailability, setCheckingAvailability] = useState(false);
-  const [availabilityStatus, setAvailabilityStatus] = useState<'IDLE' | 'AVAILABLE' | 'UNAVAILABLE'>('IDLE');
-  const [submittingBooking, setSubmittingBooking] = useState(false);
-  const [form] = Form.useForm();
-  
-  const { user } = useAuthStore();
-
-  useEffect(() => {
-    fetchFacilities();
-  }, []);
-
-  const fetchFacilities = async () => {
+  const fetchResources = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const res = await facilityApi.getAll();
-      setFacilities(res);
-    } catch (e) {
-      notification.error({ message: 'Failed to fetch facilities' });
+      const response = await axios.get('http://localhost:8080/api/resources');
+      setResources(response.data || []);
+    } catch (err) {
+      console.error("Error fetching resources:", err);
+      setError('Failed to load resources. Please try again later.');
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredFacilities = facilities.filter(f => 
-    f.name.toLowerCase().includes(searchText.toLowerCase()) &&
-    (typeFilter ? f.type === typeFilter : true) &&
-    (capacityFilter ? f.capacity >= capacityFilter : true)
-  );
+  useEffect(() => {
+    fetchResources();
+  }, []);
 
-  const openBookingModal = (facility: Facility) => {
-    setSelectedFacility(facility);
-    setBookingModalVisible(true);
-    setAvailabilityStatus('IDLE');
-    form.resetFields();
+  const handleFilterChange = (newFilters: any) => {
+    setFilters(newFilters);
   };
 
-  const closeBookingModal = () => {
-    setBookingModalVisible(false);
-    setSelectedFacility(null);
+  const handleClearFilters = () => {
+    setFilters({
+      search: '',
+      type: '',
+      status: '',
+      capacity: null
+    });
   };
 
-  const checkAvailability = async () => {
-    try {
-      const values = await form.validateFields(['date', 'timeRange']);
-      const selectedDate = values.date.format('YYYY-MM-DD');
-      const start = values.timeRange[0];
-      const end = values.timeRange[1];
-
-      setCheckingAvailability(true);
-      const bookings = await facilityApi.getAvailability(selectedFacility!.id!, selectedDate);
-      
-      // Check overlaps locally against the fetched bookings
-      let isOverlap = false;
-      for (const b of bookings) {
-        if (b.status === 'REJECTED') continue;
-        const bStart = dayjs(`${selectedDate} ${b.startTime}`);
-        const bEnd = dayjs(`${selectedDate} ${b.endTime}`);
-        
-        // Exact logic as backend
-        if (start.isBefore(bEnd) && end.isAfter(bStart)) {
-          isOverlap = true;
-          break;
-        }
-      }
-
-      if (isOverlap) {
-        setAvailabilityStatus('UNAVAILABLE');
-      } else {
-        setAvailabilityStatus('AVAILABLE');
-      }
-    } catch (e) {
-      // Form validation failed
-    } finally {
-      setCheckingAvailability(false);
+  const filteredResources = resources.filter((res: any) => {
+    if (filters.search) {
+      const query = filters.search.toLowerCase();
+      const matchName = res.name?.toLowerCase().includes(query);
+      const matchLoc = res.location?.toLowerCase().includes(query);
+      if (!matchName && !matchLoc) return false;
     }
-  };
-
-  const handleBooking = async () => {
-    try {
-      await form.validateFields();
-      if (availabilityStatus !== 'AVAILABLE') {
-        notification.warning({ message: 'Please check availability first' });
-        return;
-      }
-
-      setSubmittingBooking(true);
-      const values = form.getFieldsValue();
-      const payload = {
-        facilityId: selectedFacility!.id!,
-        userId: user!.username,
-        date: values.date.format('YYYY-MM-DD'),
-        startTime: values.timeRange[0].format('HH:mm:ss'),
-        endTime: values.timeRange[1].format('HH:mm:ss'),
-      };
-
-      await bookingApi.create(payload);
-      notification.success({ message: 'Booking successful!' });
-      closeBookingModal();
-    } catch (e: any) {
-      notification.error({ message: e.response?.data?.error || 'Failed to create booking' });
-      setAvailabilityStatus('UNAVAILABLE');
-    } finally {
-      setSubmittingBooking(false);
-    }
-  };
+    if (filters.type && res.type !== filters.type) return false;
+    if (filters.status && res.status !== filters.status) return false;
+    if (filters.capacity && res.capacity < filters.capacity) return false;
+    return true;
+  });
 
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-      <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
-        <Col><Title level={4} style={{ margin: 0 }}>Facility Catalogue</Title></Col>
-      </Row>
+    <div className="min-h-screen bg-slate-50 font-sans selection:bg-indigo-100 selection:text-indigo-900 w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+        
+        {/* Header Section */}
+        <div className="text-center mb-12 animate-fadeIn">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600">
+            Facilities & Resources
+          </h1>
+          <p className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto">
+            Discover and explore available university spaces and equipment
+          </p>
+        </div>
 
-      <Card style={{ marginBottom: 24, borderRadius: 12 }}>
-        <Row gutter={[16, 16]}>
-          <Col xs={24} sm={8}>
-            <Input 
-              placeholder="Search by name" 
-              prefix={<SearchOutlined />} 
-              value={searchText} 
-              onChange={e => setSearchText(e.target.value)} 
-              allowClear 
-            />
-          </Col>
-          <Col xs={24} sm={8}>
-            <Select 
-              placeholder="Filter by type" 
-              style={{ width: '100%' }} 
-              allowClear 
-              onChange={val => setTypeFilter(val)}
-            >
-              <Select.Option value="Lab">Lab</Select.Option>
-              <Select.Option value="Hall">Hall</Select.Option>
-              <Select.Option value="Room">Room</Select.Option>
-            </Select>
-          </Col>
-          <Col xs={24} sm={8}>
-            <InputNumber 
-              placeholder="Min Capacity" 
-              onChange={val => setCapacityFilter(val ? Number(val) : undefined)} 
-            />
-          </Col>
-        </Row>
-      </Card>
+        {/* Filter Bar */}
+        <ResourceFilterBar 
+          onFilterChange={handleFilterChange} 
+          initialFilters={filters}
+        />
 
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: '40px' }}><Spin size="large" /></div>
-      ) : filteredFacilities.length === 0 ? (
-        <Card style={{ textAlign: 'center', padding: '40px', borderRadius: 12 }}>
-           <Typography.Text type="secondary">No results found. Try adjusting your search filters.</Typography.Text>
-        </Card>
-      ) : (
-        <Row gutter={[24, 24]}>
-          {filteredFacilities.map(facility => (
-            <Col xs={24} sm={12} lg={8} key={facility.id}>
-              <Card 
-                hoverable 
-                style={{ borderRadius: 12, height: '100%', display: 'flex', flexDirection: 'column' }}
-                actions={[
-                  <Button 
-                    type="primary" 
-                    icon={<ScheduleOutlined />} 
-                    disabled={facility.status !== 'AVAILABLE'}
-                    onClick={() => openBookingModal(facility)}
-                    style={{ borderRadius: 6, width: '80%' }}
-                  >
-                    {facility.status === 'AVAILABLE' ? 'Book Now' : 'Unavailable'}
-                  </Button>
-                ]}
+        {/* State Management & Content Display */}
+        <div className="mt-8 transition-all duration-300">
+          {loading ? (
+            <LoadingSkeleton />
+          ) : error ? (
+            <div className="bg-red-50 border border-red-100 rounded-3xl p-8 max-w-lg mx-auto text-center shadow-sm">
+              <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              </div>
+              <h3 className="text-xl font-bold text-red-800 mb-2">Oops! Something went wrong</h3>
+              <p className="text-red-600 mb-6">{error}</p>
+              <button 
+                onClick={fetchResources}
+                className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                  <Title level={5} style={{ margin: 0 }}>{facility.name}</Title>
-                  <Tag color={facility.type === 'Lab' ? 'purple' : facility.type === 'Hall' ? 'geekblue' : 'cyan'}>
-                    {facility.type}
-                  </Tag>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', color: '#555' }}>
-                  <span><EnvironmentOutlined /> {facility.location}</span>
-                  <span><TeamOutlined /> Capacity: {facility.capacity}</span>
-                  <span><DesktopOutlined /> Status: <Tag color={facility.status === 'AVAILABLE' ? 'green' : 'red'}>{facility.status.replace('_', ' ')}</Tag></span>
-                </div>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      )}
-
-      <Modal
-        title={`Book ${selectedFacility?.name}`}
-        open={bookingModalVisible}
-        onCancel={closeBookingModal}
-        footer={[
-          <Button key="cancel" onClick={closeBookingModal}>Cancel</Button>,
-          <Button 
-             key="book" 
-             type="primary" 
-             disabled={availabilityStatus !== 'AVAILABLE'} 
-             loading={submittingBooking}
-             onClick={handleBooking}
-          >
-            Confirm Booking
-          </Button>
-        ]}
-      >
-        <Form form={form} layout="vertical" style={{ marginTop: 20 }} onValuesChange={() => setAvailabilityStatus('IDLE')}>
-          <Form.Item name="date" label="Select Date" rules={[{ required: true, message: 'Please select a date' }]}>
-            <DatePicker style={{ width: '100%' }} disabledDate={current => current && current < dayjs().startOf('day')} />
-          </Form.Item>
-          
-          <Form.Item name="timeRange" label="Select Time Slot" rules={[{ required: true, message: 'Please select a time range' }]}>
-            <RangePicker style={{ width: '100%' }} format="HH:mm" minuteStep={15} />
-          </Form.Item>
-
-          <Button 
-            type="dashed" 
-            block 
-            onClick={checkAvailability} 
-            loading={checkingAvailability}
-            style={{ marginBottom: 16 }}
-          >
-            Check Availability
-          </Button>
-
-          {availabilityStatus === 'AVAILABLE' && (
-            <Alert message="Facility is available for this time slot!" type="success" showIcon />
+                Retry
+              </button>
+            </div>
+          ) : filteredResources.length === 0 ? (
+            <EmptyState onClearFilters={handleClearFilters} />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-fadeIn">
+              {filteredResources.map(resource => (
+                <ResourceCard key={resource.id} resource={resource} />
+              ))}
+            </div>
           )}
-          {availabilityStatus === 'UNAVAILABLE' && (
-            <Alert message="Facility is already booked for this time slot. Please choose another." type="error" showIcon />
-          )}
-        </Form>
-      </Modal>
+        </div>
+        
+      </div>
     </div>
   );
 };

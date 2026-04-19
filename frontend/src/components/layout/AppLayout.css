@@ -13,7 +13,7 @@
   width: 260px;
   min-width: 260px;
   height: 100vh;
-  background: #0f172a;
+  background: #02216a; /*#0f172a*/
   display: flex;
   flex-direction: column;
   transition: width 0.25s ease, min-width 0.25s ease;

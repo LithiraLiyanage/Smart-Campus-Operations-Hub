@@ -95,7 +95,8 @@ export default function BookingFormPage() {
               <div className="form-group">
                 <label>Resource ID <span className="required">*</span></label>
                 <input name="resourceId" value={form.resourceId}
-                  onChange={handleChange} required placeholder="e.g. LAB-101" />
+                  onChange={(e) => setForm({ ...form, resourceId: e.target.value.toUpperCase() })} 
+                  required placeholder="e.g. LAB-101" /> 
               </div>
               <div className="form-group col-span-3">
                 <label>Resource Name <span className="required">*</span></label>

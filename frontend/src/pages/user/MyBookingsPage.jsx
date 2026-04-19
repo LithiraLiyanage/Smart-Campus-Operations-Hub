@@ -146,7 +146,7 @@ export default function MyBookingsPage() {
                 <div className="modal-form-group">
                   <label>Resource ID</label>
                   <input value={editForm.resourceId}
-                    onChange={(e) => setEditForm({ ...editForm, resourceId: e.target.value })}
+                    onChange={(e) => setEditForm({ ...editForm, resourceId: e.target.value.toUpperCase() })}
                     required placeholder="e.g. LAB-101" />
                 </div>
                 <div className="modal-form-group">

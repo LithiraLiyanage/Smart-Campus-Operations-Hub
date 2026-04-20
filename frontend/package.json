@@ -22,6 +22,8 @@
     "@vitejs/plugin-react": "^6.0.1",
     "antd": "^6.3.5",
     "axios": "^1.15.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7",
     "lucide-react": "^1.8.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",

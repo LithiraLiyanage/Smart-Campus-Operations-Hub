@@ -199,7 +199,13 @@ export default function BookingFormPage() {
       name="contactNumber"
       type="tel"
       value={form.contactNumber}
-      onChange={handleChange}
+      onChange={(e) => {
+    const value = e.target.value.replace(/\D/g, ""); // strip non-digits
+    setForm({ ...form, contactNumber: value });
+    if (errors.contactNumber) {
+      setErrors({ ...errors, contactNumber: null });
+    }
+  }}
       required
       placeholder="e.g. 0771234567"
       maxLength={10}

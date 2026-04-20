@@ -1,69 +1,57 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
-import './UserDashboard.css';
+import './AdminDashboard.css';
 
-const UserDashboard: React.FC = () => {
+const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
   const cards = [
     {
-      title: "New Booking",
-      description: "Request a new resource or facility booking",
+      title: "Booking Management",
+      description: "Review, approve or reject booking requests",
+      count: null,
       icon: (
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-            d="M12 4v16m8-8H4" />
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
         </svg>
       ),
       color: "#2563eb",
       bg: "#eff6ff",
-      path: "/dashboard/bookings/new",
-    },
-    {
-      title: "My Bookings",
-      description: "View and manage your booking requests",
-      icon: (
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      ),
-      color: "#7c3aed",
-      bg: "#f5f3ff",
-      path: "/dashboard/bookings",
+      path: "/admin/bookings",
     },
     {
       title: "Facilities",
-      description: "Browse available campus facilities and resources",
+      description: "Manage campus facilities and resources",
       icon: (
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
             d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
         </svg>
       ),
-      color: "#059669",
-      bg: "#f0fdf4",
-      path: "/dashboard/facilities",
+      color: "#7c3aed",
+      bg: "#f5f3ff",
+      path: "/admin/facilities",
     },
   ];
 
   return (
-    <div className="user-dashboard">
+    <div className="admin-dashboard">
 
       {/* Welcome banner */}
-      <div className="dashboard-banner user-banner">
+      <div className="dashboard-banner">
         <div className="banner-text">
-          <h1>Welcome, <span>{user?.username}</span> 👋</h1>
-          <p>Manage your bookings and explore campus facilities.</p>
+          <h1>Welcome back, <span>{user?.username}</span> 👋</h1>
+          <p>Here's what's happening in Smart Campus today.</p>
         </div>
         <div className="banner-role">
-          <span className="role-pill user">👤 Standard User</span>
+          <span className="role-pill admin">🔧 Administrator</span>
         </div>
       </div>
 
-      {/* Quick access */}
+      {/* Quick access cards */}
       <div className="dashboard-section-title">Quick Access</div>
       <div className="dashboard-cards">
         {cards.map((card) => (
@@ -85,7 +73,7 @@ const UserDashboard: React.FC = () => {
       </div>
 
       {/* Info section */}
-      <div className="dashboard-section-title" style={{ marginTop: 32 }}>Account Info</div>
+      <div className="dashboard-section-title" style={{ marginTop: 32 }}>System Info</div>
       <div className="info-grid">
         <div className="info-card">
           <div className="info-icon" style={{ background: "#f0fdf4", color: "#059669" }}>
@@ -95,8 +83,8 @@ const UserDashboard: React.FC = () => {
             </svg>
           </div>
           <div>
-            <div className="info-title">Status</div>
-            <div className="info-value" style={{ color: "#059669" }}>Active</div>
+            <div className="info-title">System Status</div>
+            <div className="info-value" style={{ color: "#059669" }}>All systems operational</div>
           </div>
         </div>
         <div className="info-card">
@@ -112,15 +100,15 @@ const UserDashboard: React.FC = () => {
           </div>
         </div>
         <div className="info-card">
-          <div className="info-icon" style={{ background: "#ecfdf5", color: "#059669" }}>
+          <div className="info-icon" style={{ background: "#fef3c7", color: "#d97706" }}>
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
           </div>
           <div>
             <div className="info-title">Access Level</div>
-            <div className="info-value" style={{ color: "#059669" }}>Standard User</div>
+            <div className="info-value" style={{ color: "#d97706" }}>Administrator</div>
           </div>
         </div>
       </div>
@@ -129,4 +117,4 @@ const UserDashboard: React.FC = () => {
   );
 };
 
-export default UserDashboard;
+export default AdminDashboard;

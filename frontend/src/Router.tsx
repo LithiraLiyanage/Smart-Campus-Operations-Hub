@@ -9,6 +9,7 @@ import Register from './pages/user/Register';
 import FacilitiesModule from './pages/admin/FacilitiesModule';
 import UserDashboard from './pages/user/UserDashboard';
 import Error403 from './pages/Error403';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 // Module B — Booking
 import BookingFormPage from './pages/user/BookingFormPage';
@@ -32,7 +33,7 @@ const AppRouter: React.FC = () => {
            </ProtectedRoute>
         }
       >
-        <Route index element={<div>Admin Dashboard Home. Navigate to Facilities.</div>} />
+        <Route index element={<AdminDashboard />} />
         <Route path="facilities" element={<FacilitiesModule />} />
         {/* Module B — Admin Bookings */}
         <Route path="bookings" element={<AdminBookingsPage />} />

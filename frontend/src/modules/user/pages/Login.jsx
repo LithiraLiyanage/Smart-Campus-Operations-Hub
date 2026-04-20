@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
@@ -28,26 +28,26 @@ const NotificationCard = ({ icon, tag, title, body, delay, className }) => (
 );
 
 // ─── Animated input field ─────────────────────────────────────────────────────
-const FormInput = ({ id, label, type, value, onChange, placeholder, icon, rightSlot, required }) => {
+const FormInput = ({ id, label, type, value, onChange, placeholder, icon, rightSlot, required, error }) => {
   const [focused, setFocused] = useState(false);
   return (
-    <div>
+    <div className="w-full">
       <div className="flex items-center justify-between mb-1.5">
-        <label htmlFor={id} className="text-sm font-medium text-on-surface/70">
-          {label}
+        <label htmlFor={id} className={`text-sm font-medium ${error ? 'text-red-500' : 'text-on-surface/70'}`}>
+          {label} {required && <span className="text-red-500">*</span>}
         </label>
         {rightSlot}
       </div>
       <motion.div
         animate={{
           boxShadow: focused
-            ? "0 0 0 3px rgba(91,60,221,0.18), 0 2px 8px rgba(91,60,221,0.08)"
+            ? error ? "0 0 0 3px rgba(239,68,68,0.15), 0 2px 8px rgba(239,68,68,0.08)" : "0 0 0 3px rgba(91,60,221,0.18), 0 2px 8px rgba(91,60,221,0.08)"
             : "0 0 0 0px rgba(91,60,221,0)",
         }}
         transition={{ duration: 0.2 }}
         className="relative rounded-2xl overflow-hidden"
       >
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface/35 pointer-events-none">
+        <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200 pointer-events-none ${error ? 'text-red-500' : focused ? 'text-primary' : 'text-on-surface/35'}`}>
           {icon}
         </div>
         <input
@@ -59,10 +59,24 @@ const FormInput = ({ id, label, type, value, onChange, placeholder, icon, rightS
           onBlur={() => setFocused(false)}
           placeholder={placeholder}
           required={required}
+          aria-invalid={!!error}
           autoComplete={type === "password" ? "current-password" : "email"}
-          className="w-full bg-surface-container-low border border-transparent rounded-2xl py-3.5 pl-11 pr-4 text-sm text-on-surface placeholder:text-on-surface/30 outline-none transition-all duration-200 focus:bg-surface-container-highest focus:border-primary/20"
+          className={`w-full bg-surface-container-low border ${error ? 'border-red-500/50 focus:border-red-500' : 'border-transparent focus:border-primary/20'} rounded-2xl py-3.5 pl-11 pr-4 text-sm text-on-surface placeholder:text-on-surface/30 outline-none transition-all duration-200 focus:bg-surface-container-highest`}
         />
       </motion.div>
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, height: 0, marginTop: 0 }}
+            animate={{ opacity: 1, height: "auto", marginTop: 4 }}
+            exit={{ opacity: 0, height: 0, marginTop: 0 }}
+            className="text-xs text-red-500 font-medium pl-1 overflow-hidden"
+            role="alert"
+          >
+            {error}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
@@ -71,11 +85,54 @@ const FormInput = ({ id, label, type, value, onChange, placeholder, icon, rightS
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState({ score: 0, label: "", barClass: "w-0 bg-transparent" });
+  
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [focusedPassword, setFocusedPassword] = useState(false);
+
+  // Real-time email validation
+  useEffect(() => {
+    if (email) {
+      const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      setEmailError(isValid ? "" : "Please enter a valid email address");
+    } else {
+      setEmailError("");
+    }
+  }, [email]);
+
+  // Real-time password validation & strength
+  useEffect(() => {
+    if (password) {
+      setPasswordError(password.length < 6 ? "Password must be at least 6 characters" : "");
+      
+      let score = 0;
+      if (password.length >= 6) score += 1;
+      if (/[A-Z]/.test(password) || /[a-z]/.test(password)) score += 1;
+      if (/[0-9]/.test(password) || /[^A-Za-z0-9]/.test(password)) score += 1;
+      
+      if (password.length < 6) {
+        setPasswordStrength({ score: 1, label: "Weak", barClass: "w-1/3 bg-red-500" });
+      } else if (score === 2) {
+        setPasswordStrength({ score: 2, label: "Medium", barClass: "w-2/3 bg-yellow-500" });
+      } else if (score >= 3) {
+        setPasswordStrength({ score: 3, label: "Strong", barClass: "w-full bg-green-500" });
+      } else {
+        // Fallback for edge cases
+        setPasswordStrength({ score: 1, label: "Weak", barClass: "w-1/3 bg-red-500" });
+      }
+    } else {
+      setPasswordError("");
+      setPasswordStrength({ score: 0, label: "", barClass: "w-0 bg-transparent" });
+    }
+  }, [password]);
+
+  const isFormValid = email && password && !emailError && !passwordError;
 
   // ── Backend call — identical logic to original, uses existing endpoint ──────
   const onSubmit = async (e) => {
@@ -204,19 +261,17 @@ function Login() {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="font-headline font-extrabold text-4xl xl:text-5xl text-white leading-[1.15] mb-5"
             >
-              Welcome Back to{" "}
-              <span className="editorial-text block text-white/90 mt-1">CampusFlow</span>
+              Smart Campus<br />
+              <span className="editorial-text block text-white/90 mt-1">Management System</span>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.5 }}
-              className="text-white/65 text-sm leading-relaxed max-w-xs"
+              className="text-white/65 text-sm leading-relaxed max-w-sm"
             >
-              Manage bookings, track resources, and stay connected with your campus.
-              Your all-in-one{" "}
-              <em className="editorial-text not-italic text-white/85">academic futurist</em> hub.
+              Streamline operations, optimize resource allocation, and enhance the academic experience with an integrated, intelligent platform designed for modern universities.
             </motion.p>
           </div>
 
@@ -336,6 +391,7 @@ function Login() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="campus@university.edu"
                   required
+                  error={emailError}
                   icon={
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -344,22 +400,28 @@ function Login() {
                 />
 
                 {/* Password input */}
-                <div>
+                <div className="w-full">
                   <div className="flex items-center justify-between mb-1.5">
-                    <label htmlFor="password" className="text-sm font-medium text-on-surface/70">
-                      Password
+                    <label htmlFor="password" className={`text-sm font-medium ${passwordError ? 'text-red-500' : 'text-on-surface/70'}`}>
+                      Password <span className="text-red-500">*</span>
                     </label>
                     <Link
-                      to="#"
+                      to="/forgot-password"
                       className="text-xs font-semibold text-primary hover:text-primary-container transition-colors duration-200"
                     >
                       Forgot password?
                     </Link>
                   </div>
                   <motion.div
+                    animate={{
+                      boxShadow: focusedPassword
+                        ? passwordError ? "0 0 0 3px rgba(239,68,68,0.15), 0 2px 8px rgba(239,68,68,0.08)" : "0 0 0 3px rgba(91,60,221,0.18), 0 2px 8px rgba(91,60,221,0.08)"
+                        : "0 0 0 0px rgba(91,60,221,0)",
+                    }}
+                    transition={{ duration: 0.2 }}
                     className="relative rounded-2xl overflow-hidden"
                   >
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface/35 pointer-events-none">
+                    <div className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors duration-200 ${passwordError ? 'text-red-500' : focusedPassword ? 'text-primary' : 'text-on-surface/35'}`}>
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
@@ -369,16 +431,19 @@ function Login() {
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      onFocus={() => setFocusedPassword(true)}
+                      onBlur={() => setFocusedPassword(false)}
                       placeholder="••••••••"
                       required
+                      aria-invalid={!!passwordError}
                       autoComplete="current-password"
-                      className="w-full bg-surface-container-low border border-transparent rounded-2xl py-3.5 pl-11 pr-12 text-sm text-on-surface placeholder:text-on-surface/30 outline-none transition-all duration-200 focus:bg-surface-container-highest focus:border-primary/20 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.15)]"
+                      className={`w-full bg-surface-container-low border ${passwordError ? 'border-red-500/50 focus:border-red-500' : 'border-transparent focus:border-primary/20'} rounded-2xl py-3.5 pl-11 pr-12 text-sm text-on-surface placeholder:text-on-surface/30 outline-none transition-all duration-200 focus:bg-surface-container-highest`}
                     />
                     {/* Show/hide toggle */}
                     <button
                       type="button"
                       onClick={() => setShowPassword((v) => !v)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-lg text-on-surface/35 hover:text-primary transition-colors"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-lg text-on-surface/40 hover:text-primary transition-colors focus:outline-none"
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? (
@@ -393,6 +458,41 @@ function Login() {
                       )}
                     </button>
                   </motion.div>
+                  
+                  {/* Password Strength Indicator */}
+                  {password && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      className="mt-2 text-xs flex items-center justify-between"
+                    >
+                      <div className="flex-1 max-w-[60%] flex items-center gap-1">
+                        <div className="h-1.5 flex-1 rounded-full bg-surface-container-highest overflow-hidden">
+                          <motion.div 
+                            className={`h-full rounded-full transition-all duration-300 ${passwordStrength.barClass}`}
+                          />
+                        </div>
+                      </div>
+                      <span className={`font-medium ${passwordStrength.score >= 3 ? 'text-green-500' : passwordStrength.score === 2 ? 'text-yellow-500' : 'text-red-500'}`}>
+                        {passwordStrength.label}
+                      </span>
+                    </motion.div>
+                  )}
+
+                  {/* Inline error for password */}
+                  <AnimatePresence>
+                    {passwordError && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                        animate={{ opacity: 1, height: "auto", marginTop: 4 }}
+                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                        className="text-xs text-red-500 font-medium pl-1 overflow-hidden"
+                        role="alert"
+                      >
+                        {passwordError}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
                 {/* Remember me checkbox */}
@@ -429,10 +529,10 @@ function Login() {
                 {/* Login button */}
                 <motion.button
                   type="submit"
-                  disabled={loading}
-                  whileHover={{ scale: loading ? 1 : 1.02, y: loading ? 0 : -1 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full py-3.5 rounded-2xl bg-brand-gradient text-white font-semibold text-sm shadow-card hover:shadow-card-hover transition-all duration-300 flex items-center justify-center gap-2.5 disabled:opacity-70 disabled:cursor-not-allowed mt-2"
+                  disabled={loading || !isFormValid}
+                  whileHover={(!loading && isFormValid) ? { scale: 1.02, y: -1 } : {}}
+                  whileTap={(!loading && isFormValid) ? { scale: 0.98 } : {}}
+                  className={`w-full py-3.5 rounded-2xl text-white font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2.5 mt-2 ${!isFormValid ? 'bg-surface-container-highest text-on-surface/40 cursor-not-allowed' : 'bg-brand-gradient shadow-card hover:shadow-card-hover'}`}
                 >
                   {loading ? (
                     <>

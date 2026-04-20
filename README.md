@@ -137,25 +137,6 @@ User → Request Booking → Admin Review → Approve/Reject → Notification
 ```
 User → Create Ticket → Assign Technician → Update Status → Resolve → Close
 ```
-
----
-
-## 📸 UI Preview
-
-<p align="center">
-  <img src="./screenshots/login.png" width="45%" />
-  <img src="./screenshots/dashboard.png" width="45%" />
-</p>
-
-<p align="center">
-  <img src="./screenshots/booking.png" width="45%" />
-  <img src="./screenshots/tickets.png" width="45%" />
-</p>
-
-<p align="center">
-  <img src="./screenshots/notifications.png" width="45%" />
-</p>
-
 ---
 
 ## ⚡ Installation & Setup

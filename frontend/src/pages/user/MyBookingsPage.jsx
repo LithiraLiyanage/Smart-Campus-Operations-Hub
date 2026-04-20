@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getUserBookings, cancelBooking, deleteBooking, updateBooking } from "../../api/bookingApi";
+import { useAuthStore } from "../../store/authStore";
 import "./MyBookingsPage.css";
 
 const StatusBadge = ({ status }) => (
@@ -9,7 +10,8 @@ const StatusBadge = ({ status }) => (
 
 export default function MyBookingsPage() {
   const { userId } = useParams();
-  const currentUserId = userId || "user123";
+  const { user } = useAuthStore();
+  const currentUserId = userId || user?.username || "";
 
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);

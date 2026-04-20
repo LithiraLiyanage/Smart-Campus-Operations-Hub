@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { createBooking } from "../../api/bookingApi";
 import "./BookingFormPage.css";
+import { useAuthStore } from "../../store/authStore";
 
 const today = new Date().toISOString().split("T")[0];
 
 export default function BookingFormPage() {
+  const { user } = useAuthStore();
   const [form, setForm] = useState({
     resourceId: "", resourceName: "",
-    userId: "", userName: "",
+  userId: user?.username || "",userName: "", 
     purpose: "", expectedAttendees: 1,
     specialRequirements: "", contactNumber: "",
     bookingDate: "", startTime: "", endTime: "",

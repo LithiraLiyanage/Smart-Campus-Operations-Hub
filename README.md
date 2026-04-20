@@ -1,13 +1,22 @@
 # 🚀 Smart Campus Operations Hub
 
 ![GitHub stars](https://img.shields.io/github/stars/LithiraLiyanage/Smart-Campus-Operations-Hub?style=for-the-badge)
+
 ![GitHub forks](https://img.shields.io/github/forks/LithiraLiyanage/Smart-Campus-Operations-Hub?style=for-the-badge)
+
 ![GitHub issues](https://img.shields.io/github/issues/LithiraLiyanage/Smart-Campus-Operations-Hub?style=for-the-badge)
+
 ![GitHub last commit](https://img.shields.io/github/last-commit/LithiraLiyanage/Smart-Campus-Operations-Hub?style=for-the-badge)
 
+
+
+
 ![React](https://img.shields.io/badge/Frontend-React-blue?style=for-the-badge\&logo=react)
+
 ![Spring Boot](https://img.shields.io/badge/Backend-SpringBoot-green?style=for-the-badge\&logo=springboot)
+
 ![MongoDB](https://img.shields.io/badge/Database-MongoDB-darkgreen?style=for-the-badge\&logo=mongodb)
+
 ![Tailwind](https://img.shields.io/badge/UI-TailwindCSS-38B2AC?style=for-the-badge\&logo=tailwindcss)
 
 ---

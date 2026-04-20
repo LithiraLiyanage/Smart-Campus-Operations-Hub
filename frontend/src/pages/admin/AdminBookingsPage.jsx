@@ -142,8 +142,8 @@ export default function AdminBookingsPage() {
     b.expectedAttendees || "—",
     b.startTime ? new Date(b.startTime).toLocaleDateString() : "—",
     b.startTime
-      ? `${new Date(b.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} → ${new Date(b.endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
-      : "—",
+  ? `${new Date(b.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true })} -\n${new Date(b.endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true })}`
+  : "—",
     b.specialRequirements || "—",
     b.status || "—",
     b.adminReason || "—",
@@ -163,6 +163,7 @@ export default function AdminBookingsPage() {
       textColor: [71, 85, 105],
       lineColor: [226, 232, 240],
       lineWidth: 0.3,
+      overflow: "linebreak"
     },
     headStyles: {
       fillColor: [30, 41, 59],
@@ -175,7 +176,7 @@ export default function AdminBookingsPage() {
       fillColor: [248, 250, 252],
     },
     columnStyles: {
-      0:  { cellWidth: 8,  halign: "center" },
+      0:  { cellWidth: 12,  halign: "center" },
       1:  { cellWidth: 22 },
       2:  { cellWidth: 28 },
       3:  { cellWidth: 24 },
@@ -183,34 +184,44 @@ export default function AdminBookingsPage() {
       5:  { cellWidth: 28 },
       6:  { cellWidth: 16, halign: "center" },
       7:  { cellWidth: 22, halign: "center" },
-      8:  { cellWidth: 28 },
+      8:  { cellWidth: 32 },
       9:  { cellWidth: 24 },
       10: { cellWidth: 18, halign: "center" },
       11: { cellWidth: 24 },
     },
     // Color status cell
     didDrawCell: (data) => {
-      if (data.section === "body" && data.column.index === 10) {
-        const status = data.cell.raw;
-        const colors = {
-          PENDING:   [217, 119,   6],
-          APPROVED:  [  5, 150, 105],
-          REJECTED:  [220,  38,  38],
-          CANCELLED: [100, 116, 139],
-        };
-        if (colors[status]) {
-          doc.setTextColor(...colors[status]);
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(7.5);
-          doc.text(
-            status,
-            data.cell.x + data.cell.width / 2,
-            data.cell.y + data.cell.height / 2 + 1,
-            { align: "center" }
-          );
-        }
-      }
-    },
+  if (data.section === "body" && data.column.index === 10) {
+    const status = data.cell.raw;
+    const colors = {
+      PENDING:   [217, 119,   6],
+      APPROVED:  [  5, 150, 105],
+      REJECTED:  [220,  38,  38],
+      CANCELLED: [100, 116, 139],
+    };
+    if (colors[status]) {
+      // Cover default black text with white box
+      doc.setFillColor(255, 255, 255);
+      doc.rect(
+        data.cell.x + 0.5,
+        data.cell.y + 0.5,
+        data.cell.width - 1,
+        data.cell.height - 1,
+        "F"
+      );
+      // Draw colored text
+      doc.setTextColor(...colors[status]);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(7.5);
+      doc.text(
+        status,
+        data.cell.x + data.cell.width / 2,
+        data.cell.y + data.cell.height / 2 + 1,
+        { align: "center" }
+      );
+    }
+  }
+},
     margin: { left: 14, right: 14 },
   });
 

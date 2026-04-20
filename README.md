@@ -1,23 +1,26 @@
 # 🚀 Smart Campus Operations Hub
-
-![GitHub stars](https://img.shields.io/github/stars/LithiraLiyanage/Smart-Campus-Operations-Hub?style=for-the-badge)
-
-![GitHub forks](https://img.shields.io/github/forks/LithiraLiyanage/Smart-Campus-Operations-Hub?style=for-the-badge)
-
-![GitHub issues](https://img.shields.io/github/issues/LithiraLiyanage/Smart-Campus-Operations-Hub?style=for-the-badge)
-
-![GitHub last commit](https://img.shields.io/github/last-commit/LithiraLiyanage/Smart-Campus-Operations-Hub?style=for-the-badge)
+<p align="center">
+  <img src="https://readme-typing-svg.herokuapp.com/?color=00F7FF&size=28&center=true&vCenter=true&width=700&lines=Smart+Campus+Operations+Hub;Modern+University+Management+System;React+%2B+Spring+Boot+Project" />
+</p>
 
 
+<p align="center">
+  <b>A modern platform for managing campus facilities, bookings, and maintenance workflows</b>
+</p>
 
+<p align="center">
+  <img src="https://img.shields.io/github/stars/LithiraLiyanage/Smart-Campus-Operations-Hub?style=for-the-badge&color=yellow" />
+  <img src="https://img.shields.io/github/forks/LithiraLiyanage/Smart-Campus-Operations-Hub?style=for-the-badge&color=blue" />
+  <img src="https://img.shields.io/github/issues/LithiraLiyanage/Smart-Campus-Operations-Hub?style=for-the-badge&color=green" />
+  <img src="https://img.shields.io/github/last-commit/LithiraLiyanage/Smart-Campus-Operations-Hub?style=for-the-badge&color=orange" />
+</p>
 
-![React](https://img.shields.io/badge/Frontend-React-blue?style=for-the-badge\&logo=react)
-
-![Spring Boot](https://img.shields.io/badge/Backend-SpringBoot-green?style=for-the-badge\&logo=springboot)
-
-![MongoDB](https://img.shields.io/badge/Database-MongoDB-darkgreen?style=for-the-badge\&logo=mongodb)
-
-![Tailwind](https://img.shields.io/badge/UI-TailwindCSS-38B2AC?style=for-the-badge\&logo=tailwindcss)
+<p align="center">
+  <img src="https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react&logoColor=black"/>
+  <img src="https://img.shields.io/badge/Backend-SpringBoot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Database-MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white"/>
+  <img src="https://img.shields.io/badge/UI-TailwindCSS-38B2AC?style=for-the-badge&logo=tailwindcss&logoColor=white"/>
+</p>
 
 ---
 

@@ -20,11 +20,13 @@ import ResourceCataloguePage from "./pages/ResourceCataloguePage";
 import ResourceDetailsPage from "./pages/ResourceDetailsPage";
 import AddResourcePage from "./pages/AddResourcePage";
 
+import { ThemeProvider } from "./contexts/ThemeContext";
 import "./App.css";
 
 function App() {
   return (
-    <Router>
+    <ThemeProvider>
+      <Router>
       <Routes>
         {/* ── Landing page (standalone landing Navbar) ───────────────── */}
         <Route path="/" element={<Home />} />
@@ -48,6 +50,7 @@ function App() {
         <Route path="/add-resource" element={<AddResourcePage />} />
       </Routes>
     </Router>
+    </ThemeProvider>
   );
 }
 

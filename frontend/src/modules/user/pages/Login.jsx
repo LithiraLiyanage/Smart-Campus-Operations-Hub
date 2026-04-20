@@ -217,7 +217,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center bg-[#050508] overflow-hidden sm:px-6">
+    <div className="min-h-screen relative flex items-center justify-center bg-surface overflow-hidden sm:px-6 transition-colors duration-300">
       
       <NoiseTexture />
       
@@ -266,8 +266,8 @@ export default function Login() {
         <motion.div 
           whileHover={{ rotateX: 2, rotateY: -2 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          className="relative bg-white/[0.04] backdrop-blur-3xl border border-white/[0.08] p-8 sm:p-10 rounded-[2.5rem] shadow-[0_24px_40px_-10px_rgba(0,0,0,0.6),_inset_0_1px_0_0_rgba(255,255,255,0.15)]"
-          style={{ transformStyle: "preserve-3d" }}
+          className="relative bg-black/[0.02] dark:bg-white/[0.04] backdrop-blur-3xl border border-black/[0.08] dark:border-white/[0.08] p-8 sm:p-10 rounded-[2.5rem] shadow-[0_24px_40px_-10px_rgba(0,0,0,0.2)] dark:shadow-[0_24px_40px_-10px_rgba(0,0,0,0.6)]"
+          style={{ transformStyle: "preserve-3d", boxShadow: "inset 0 1px 0 0 rgba(255,255,255,0.15)" }}
         >
           {/* Subtle top glow line */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
@@ -282,10 +282,10 @@ export default function Login() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
               </svg>
             </motion.div>
-            <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-white to-white/60 tracking-tight mb-2">
+            <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-on-surface to-on-surface/60 dark:from-white dark:to-white/60 tracking-tight mb-2">
               Enter the Portal
             </h1>
-            <p className="text-sm text-white/50 font-medium">Access your intelligent campus dashboard</p>
+            <p className="text-sm text-on-surface/50 dark:text-white/50 font-medium">Access your intelligent campus dashboard</p>
           </div>
 
           <form onSubmit={onSubmit} noValidate className="flex flex-col gap-1">
@@ -369,7 +369,7 @@ export default function Login() {
               className={`relative w-full py-4 rounded-2xl font-bold text-sm tracking-wide overflow-hidden transition-all duration-300 ${
                 isFormValid 
                   ? "text-white shadow-[0_0_20px_rgba(168,85,247,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.5)]" 
-                  : "text-white/30 bg-white/5 cursor-not-allowed border border-white/10"
+                  : "text-on-surface/30 dark:text-white/30 bg-black/5 dark:bg-white/5 cursor-not-allowed border border-black/10 dark:border-white/10"
               }`}
             >
               {isFormValid && (

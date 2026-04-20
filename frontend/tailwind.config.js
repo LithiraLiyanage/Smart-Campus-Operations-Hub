@@ -1,18 +1,19 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: "class",
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       colors: {
         primary: "#3b82f6", // Electric Blue
         "primary-container": "#2563eb",
-        surface: "#02040a", // Deep Black/Navy
-        "surface-container-low": "#0b0f19",
-        "surface-container-highest": "#111827",
-        "surface-container-lowest": "#000000",
+        surface: "var(--color-surface)",
+        "surface-container-low": "var(--color-surface-container-low)",
+        "surface-container-highest": "var(--color-surface-container-highest)",
+        "surface-container-lowest": "var(--color-surface-container-lowest)",
         tertiary: "#8b5cf6", // Purple/Indigo
         secondary: "#6366f1", // Indigo
-        "on-surface": "#f8fafc",
+        "on-surface": "var(--color-on-surface)",
       },
       fontFamily: {
         sans: ["Inter", "sans-serif"],

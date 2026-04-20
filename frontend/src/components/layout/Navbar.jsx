@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import useAuth from "../../hooks/useAuth";
+import ThemeToggle from "../ui/ThemeToggle";
 
 const NavLink = ({ to, children, onClick }) => {
   const location = useLocation();
@@ -115,6 +116,7 @@ const Navbar = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
+            <ThemeToggle className="mr-2" />
             {isAuthenticated ? (
               <>
                 <Link
@@ -179,6 +181,11 @@ const Navbar = () => {
               />
             </div>
           </button>
+          
+          {/* Mobile Theme Toggle (visible only below md, next to hamburger) */}
+          <div className="md:hidden ml-4">
+            <ThemeToggle />
+          </div>
         </div>
 
         {/* Mobile Menu */}

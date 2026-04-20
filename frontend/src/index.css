@@ -5,6 +5,22 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-surface: #f8fafc;
+    --color-surface-container-low: #ffffff;
+    --color-surface-container-highest: #e2e8f0;
+    --color-surface-container-lowest: #f1f5f9;
+    --color-on-surface: #0f172a;
+  }
+
+  .dark {
+    --color-surface: #02040a;
+    --color-surface-container-low: #0b0f19;
+    --color-surface-container-highest: #111827;
+    --color-surface-container-lowest: #000000;
+    --color-on-surface: #f8fafc;
+  }
+
   * {
     box-sizing: border-box;
     margin: 0;
@@ -17,10 +33,15 @@
 
   body {
     font-family: "Inter", sans-serif;
-    color: #e5e7eb;
-    background-color: #020617;
+    color: var(--color-on-surface);
+    background-color: var(--color-surface);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  nav, header, footer {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
   }
 }
 

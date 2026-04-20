@@ -1,10 +1,11 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AppLayout from './components/layout/AppLayout';
-// import ProtectedRoute from './components/auth/ProtectedRoute';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 import LandingPage from './pages/LandingPage';
-import LoginPage from './pages/LoginPage';
+import Login from './pages/user/Login';
+import Register from './pages/user/Register';
 import FacilitiesModule from './pages/admin/FacilitiesModule';
 import UserDashboard from './pages/user/UserDashboard';
 import Error403 from './pages/Error403';
@@ -18,16 +19,17 @@ const AppRouter: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/login" element={<Login />} />
+<Route path="/register" element={<Register />} />
       <Route path="/403" element={<Error403 />} />
 
       {/* Admin Routes */}
       <Route
         path="/admin"
         element={
-          // <ProtectedRoute allowedRoles={['ADMIN']}>
+           <ProtectedRoute allowedRoles={['ADMIN']}>
             <AppLayout />
-          // </ProtectedRoute>
+           </ProtectedRoute>
         }
       >
         <Route index element={<div>Admin Dashboard Home. Navigate to Facilities.</div>} />
@@ -40,9 +42,9 @@ const AppRouter: React.FC = () => {
       <Route
         path="/dashboard"
         element={
-          // <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+           <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
             <AppLayout />
-          // </ProtectedRoute>
+           </ProtectedRoute>
         }
       >
         <Route index element={<UserDashboard />} />

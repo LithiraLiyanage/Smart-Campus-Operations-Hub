@@ -14,12 +14,19 @@ public interface BookingRepository extends MongoRepository<Booking, String> {
 
     List<Booking> findByResourceId(String resourceId);
 
-    // Find overlapping APPROVED bookings for conflict detection
-    @Query("{ 'resourceId': ?0, 'status': { $in: ['PENDING', 'APPROVED'] }, " +
+    // For creation — block if PENDING or APPROVED exists
+@Query("{ 'resourceId': ?0, 'status': { $in: ['PENDING', 'APPROVED'] }, " +
        "'startTime': { $lt: ?2 }, 'endTime': { $gt: ?1 } }")
 List<Booking> findConflictingBookings(String resourceId,
                                       LocalDateTime startTime,
                                       LocalDateTime endTime);
+
+// For approval — only block if APPROVED exists
+@Query("{ 'resourceId': ?0, 'status': 'APPROVED', " +
+       "'startTime': { $lt: ?2 }, 'endTime': { $gt: ?1 } }")
+List<Booking> findApprovedConflicts(String resourceId,
+                                    LocalDateTime startTime,
+                                    LocalDateTime endTime);
 
     List<Booking> findByStatus(BookingStatus status);
     List<Booking> findAllByOrderByCreatedAtDesc();

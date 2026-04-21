@@ -84,16 +84,18 @@ public class BookingService {
         }
 
         if (dto.getStatus() == BookingStatus.APPROVED) {
-            // Check for scheduling conflicts before approving
-            List<Booking> conflicts = bookingRepository.findConflictingBookings(
-                    booking.getResourceId(),
-                    booking.getStartTime(),
-                    booking.getEndTime()
-            );
-            if (!conflicts.isEmpty()) {
-                throw new ConflictException("Resource is already booked for this time slot");
-            }
-        }
+    List<Booking> conflicts = bookingRepository.findApprovedConflicts(
+            booking.getResourceId(),
+            booking.getStartTime(),
+            booking.getEndTime()
+    ).stream()
+     .filter(b -> !b.getId().equals(id)) // exclude self
+     .toList();
+
+    if (!conflicts.isEmpty()) {
+        throw new ConflictException("Resource is already booked for this time slot");
+    }
+}
 
         if (dto.getStatus() == BookingStatus.REJECTED && 
             (dto.getReason() == null || dto.getReason().isBlank())) {

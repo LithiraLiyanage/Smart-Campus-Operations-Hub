@@ -20,176 +20,169 @@ public class TicketService {
         this.ticketRepository = ticketRepository;
     }
 
-    // Create Ticket with Validation
-    public Ticket createTicket(Ticket ticket) {
+    public Ticket createTicket(
+            String title,
+            String description,
+            String category,
+            String priority,
+            String location,
+            String preferredContact,
+            String studentName,
+            String studentEmail,
+            MultipartFile[] files
+    ) throws IOException {
 
-        if (ticket.getTitle() == null || ticket.getTitle().trim().isEmpty()) {
-            throw new RuntimeException("Title is required");
-        }
+        requireText(title, "Title is required");
+        requireText(description, "Description is required");
+        requireText(category, "Category is required");
+        requireText(priority, "Priority is required");
+        requireText(location, "Location is required");
+        requireText(preferredContact, "Preferred contact is required");
+        requireText(studentName, "Student name is required");
+        requireText(studentEmail, "Student email is required");
 
-        if (ticket.getDescription() == null || ticket.getDescription().trim().isEmpty()) {
-            throw new RuntimeException("Description is required");
-        }
-
-        if (ticket.getCategory() == null || ticket.getCategory().trim().isEmpty()) {
-            throw new RuntimeException("Category is required");
-        }
-
-        if (ticket.getPriority() == null || ticket.getPriority().trim().isEmpty()) {
-            throw new RuntimeException("Priority is required");
-        }
-
-        if (ticket.getPreferredContact() == null || ticket.getPreferredContact().trim().isEmpty()) {
-            throw new RuntimeException("Preferred contact is required");
-        }
-
+        Ticket ticket = new Ticket();
+        ticket.setTitle(title);
+        ticket.setDescription(description);
+        ticket.setCategory(category);
+        ticket.setPriority(priority);
+        ticket.setLocation(location);
+        ticket.setPreferredContact(preferredContact);
+        ticket.setStudentName(studentName);
+        ticket.setStudentEmail(studentEmail);
+        ticket.setStatus("OPEN");
         ticket.setCreatedAt(LocalDateTime.now());
         ticket.setUpdatedAt(LocalDateTime.now());
 
+        if (files != null && files.length > 3) {
+            throw new RuntimeException("Maximum 3 attachments allowed");
+        }
+
+        saveFiles(files, ticket.getAttachments());
         return ticketRepository.save(ticket);
     }
 
-    // Get All Tickets
     public List<Ticket> getAllTickets() {
         return ticketRepository.findAll();
     }
 
-    // Get Ticket by ID
+    public List<Ticket> getTicketsByStudent(String studentEmail) {
+        return ticketRepository.findByStudentEmailOrderByCreatedAtDesc(studentEmail);
+    }
+
+    public List<Ticket> getTicketsByTechnician(String technicianEmail) {
+        return ticketRepository.findByAssignedTechnicianEmailOrderByCreatedAtDesc(technicianEmail);
+    }
+
     public Ticket getTicketById(String id) {
         return ticketRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ticket not found"));
     }
 
-    // Update Status
-    public Ticket updateStatus(String id, String status, String role) {
+    public Ticket approveTicket(String id, String technicianName, String technicianEmail, String role) {
+        checkRole(role, "ADMIN");
+        requireText(technicianName, "Technician name is required");
+        requireText(technicianEmail, "Technician email is required");
 
-    checkRole(role, "TECHNICIAN", "ADMIN");
-
-    Ticket ticket = ticketRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Ticket not found"));
-
-    ticket.setStatus(status);
-    ticket.setUpdatedAt(java.time.LocalDateTime.now());
-
-    return ticketRepository.save(ticket);
-    }
-
-    // Assign Technician
-    public Ticket assignTechnician(String id, String technician, String role) {
-
-    checkRole(role, "TECHNICIAN", "ADMIN");
-
-    Ticket ticket = ticketRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Ticket not found"));
-
-    ticket.setAssignedTechnician(technician);
-    ticket.setUpdatedAt(java.time.LocalDateTime.now());
-
-    return ticketRepository.save(ticket);
-    }
-
-    // Add Comment
-    public Ticket addComment(String id, String comment) {
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ticket not found"));
-
-        if (comment == null || comment.trim().isEmpty()) {
-            throw new RuntimeException("Comment cannot be empty");
-        }
-
-        ticket.getComments().add(comment);
+        Ticket ticket = getTicketById(id);
+        ticket.setAssignedTechnician(technicianName);
+        ticket.setAssignedTechnicianEmail(technicianEmail);
+        ticket.setStatus("IN_PROGRESS");
         ticket.setUpdatedAt(LocalDateTime.now());
-
         return ticketRepository.save(ticket);
     }
 
-    // Delete Comment
-    public Ticket deleteComment(String id, int index) {
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+    public Ticket rejectTicket(String id, String reason, String role) {
+        checkRole(role, "ADMIN");
+        requireText(reason, "Reject reason is required");
 
+        Ticket ticket = getTicketById(id);
+        ticket.setStatus("REJECTED");
+        ticket.setRejectedReason(reason);
+        ticket.setUpdatedAt(LocalDateTime.now());
+        return ticketRepository.save(ticket);
+    }
+
+    public Ticket resolveTicket(String id, String resolutionNotes, MultipartFile[] files, String role) throws IOException {
+        checkRole(role, "TECHNICIAN");
+        requireText(resolutionNotes, "Resolution comment is required");
+
+        Ticket ticket = getTicketById(id);
+        ticket.setResolutionNotes(resolutionNotes);
+        ticket.setStatus("RESOLVED");
+
+        int currentCount = ticket.getResolutionImages() != null ? ticket.getResolutionImages().size() : 0;
+        int newCount = files == null ? 0 : files.length;
+        if (currentCount + newCount > 3) {
+            throw new RuntimeException("Maximum 3 resolution images allowed");
+        }
+
+        saveFiles(files, ticket.getResolutionImages());
+        ticket.setUpdatedAt(LocalDateTime.now());
+        return ticketRepository.save(ticket);
+    }
+
+    public Ticket closeTicket(String id, String role) {
+        checkRole(role, "ADMIN");
+        Ticket ticket = getTicketById(id);
+        ticket.setStatus("CLOSED");
+        ticket.setUpdatedAt(LocalDateTime.now());
+        return ticketRepository.save(ticket);
+    }
+
+    public Ticket addComment(String id, String comment) {
+        Ticket ticket = getTicketById(id);
+        requireText(comment, "Comment cannot be empty");
+        ticket.getComments().add(comment);
+        ticket.setUpdatedAt(LocalDateTime.now());
+        return ticketRepository.save(ticket);
+    }
+
+    public Ticket deleteComment(String id, int index) {
+        Ticket ticket = getTicketById(id);
         if (index < 0 || index >= ticket.getComments().size()) {
             throw new RuntimeException("Invalid comment index");
         }
-
         ticket.getComments().remove(index);
         ticket.setUpdatedAt(LocalDateTime.now());
-
         return ticketRepository.save(ticket);
     }
 
-    // Update Resolution Notes
-    public Ticket updateResolutionNotes(String id, String resolutionNotes) {
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ticket not found"));
-
-        ticket.setResolutionNotes(resolutionNotes);
-        ticket.setUpdatedAt(LocalDateTime.now());
-
-        return ticketRepository.save(ticket);
-    }
-
-    // Reject Ticket
-    public Ticket rejectTicket(String id, String reason, String role) {
-
-    checkRole(role, "ADMIN"); // only ADMIN allowed
-
-    Ticket ticket = ticketRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Ticket not found"));
-
-    ticket.setStatus("REJECTED");
-    ticket.setRejectedReason(reason);
-    ticket.setUpdatedAt(java.time.LocalDateTime.now());
-
-    return ticketRepository.save(ticket);
-    }
-    // Upload Attachments
-    public Ticket uploadAttachments(String id, MultipartFile[] files) throws IOException {
-
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ticket not found"));
-
+    private void saveFiles(MultipartFile[] files, List<String> targetList) throws IOException {
         if (files == null || files.length == 0) {
-            throw new RuntimeException("No files uploaded");
-        }
-
-        int currentCount = ticket.getAttachments() != null ? ticket.getAttachments().size() : 0;
-
-        if (currentCount + files.length > 3) {
-            throw new RuntimeException("Maximum 3 attachments allowed");
+            return;
         }
 
         File uploadDir = new File(System.getProperty("user.dir") + File.separator + "uploads");
-
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
         }
 
         for (MultipartFile file : files) {
-            if (!file.isEmpty()) {
+            if (file != null && !file.isEmpty()) {
                 String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
                 File destinationFile = new File(uploadDir, fileName);
                 file.transferTo(destinationFile);
-                ticket.getAttachments().add(fileName);
+                targetList.add(fileName);
             }
         }
+    }
 
-        ticket.setUpdatedAt(LocalDateTime.now());
-
-        return ticketRepository.save(ticket);
+    private void requireText(String value, String message) {
+        if (value == null || value.trim().isEmpty()) {
+            throw new RuntimeException(message);
+        }
     }
 
     private void checkRole(String role, String... allowedRoles) {
-    if (role == null || role.trim().isEmpty()) {
-        throw new RuntimeException("Role is required");
-    }
-
-    for (String allowed : allowedRoles) {
-        if (allowed.equalsIgnoreCase(role)) {
-            return;
+        if (role == null || role.trim().isEmpty()) {
+            throw new RuntimeException("Role is required");
         }
-    }
-
-    throw new RuntimeException("Access denied for role: " + role);
+        for (String allowed : allowedRoles) {
+            if (allowed.equalsIgnoreCase(role)) {
+                return;
+            }
+        }
+        throw new RuntimeException("Access denied for role: " + role);
     }
 }

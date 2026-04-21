@@ -22,13 +22,18 @@ public class Ticket {
     private String location;
     private String preferredContact;
 
+    private String studentName;
+    private String studentEmail;
+
     private String status = "OPEN"; // OPEN, IN_PROGRESS, RESOLVED, CLOSED, REJECTED
 
     private String assignedTechnician;
+    private String assignedTechnicianEmail;
     private String resolutionNotes;
     private String rejectedReason;
 
     private List<String> attachments = new ArrayList<>();
+    private List<String> resolutionImages = new ArrayList<>();
     private List<String> comments = new ArrayList<>();
 
     private LocalDateTime createdAt = LocalDateTime.now();

@@ -3,6 +3,7 @@ package com.smartcampus.backend.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.http.SessionCreationPolicy; // 🔥 add this
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -46,6 +47,15 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
+                        /**
+                         * Facilities & Assets role rules:
+                         * - USER/ADMIN: view + search resources
+                         * - ADMIN only: create/update/delete resources
+                         */
+                        .requestMatchers(HttpMethod.GET, "/api/resources/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/resources/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/resources/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/resources/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

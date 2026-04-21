@@ -16,4 +16,9 @@ public interface ResourceRepository extends MongoRepository<Resource, String> {
     List<Resource> findByCapacityGreaterThanEqual(int capacity);
     List<Resource> findByLocation(String location);
     List<Resource> findByStatus(ResourceStatus status);
+
+    // Common combinations (useful for simple cases; complex combinations handled in service via MongoTemplate)
+    List<Resource> findByTypeAndStatus(ResourceType type, ResourceStatus status);
+    List<Resource> findByTypeAndCapacityGreaterThanEqual(ResourceType type, int capacity);
+    List<Resource> findByStatusAndCapacityGreaterThanEqual(ResourceStatus status, int capacity);
 }

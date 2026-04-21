@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ResourceFilters from '../components/ResourceFilters';
 import ResourceForm from '../components/ResourceForm';
 import ResourceTable from '../components/ResourceTable';
@@ -27,20 +27,30 @@ const ResourcesPage: React.FC = () => {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Resource | null>(null);
 
+  const alertTimerRef = useRef<number | null>(null);
+
   const clearAlertSoon = useCallback(() => {
-    window.clearTimeout((clearAlertSoon as any)._t);
-    (clearAlertSoon as any)._t = window.setTimeout(() => setAlert(null), 3500);
+    if (alertTimerRef.current != null) {
+      window.clearTimeout(alertTimerRef.current);
+    }
+    alertTimerRef.current = window.setTimeout(() => setAlert(null), 3500);
   }, []);
 
-  const showSuccess = (message: string) => {
-    setAlert({ type: 'success', message });
-    clearAlertSoon();
-  };
+  const showSuccess = useCallback(
+    (message: string) => {
+      setAlert({ type: 'success', message });
+      clearAlertSoon();
+    },
+    [clearAlertSoon]
+  );
 
-  const showError = (message: string) => {
-    setAlert({ type: 'error', message });
-    clearAlertSoon();
-  };
+  const showError = useCallback(
+    (message: string) => {
+      setAlert({ type: 'error', message });
+      clearAlertSoon();
+    },
+    [clearAlertSoon]
+  );
 
   const fetchResources = useCallback(
     async (activeFilters: Filters) => {
@@ -56,6 +66,14 @@ const ResourcesPage: React.FC = () => {
     },
     [showError]
   );
+
+  useEffect(() => {
+    return () => {
+      if (alertTimerRef.current != null) {
+        window.clearTimeout(alertTimerRef.current);
+      }
+    };
+  }, []);
 
   // Dynamic filtering: refetch when filters change
   useEffect(() => {

@@ -9,7 +9,7 @@ export default function BookingFormPage() {
   const { user } = useAuthStore();
   const [form, setForm] = useState({
     resourceId: "", resourceName: "",
-  userId: user?.username || "",userName: "", 
+    userId: "", userName: user?.username ||  "", 
     purpose: "", expectedAttendees: 1,
     specialRequirements: "", contactNumber: "",
     bookingDate: "", startTime: "", endTime: "",

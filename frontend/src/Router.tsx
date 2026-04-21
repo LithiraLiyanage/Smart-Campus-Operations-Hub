@@ -10,6 +10,7 @@ import FacilitiesModule from './pages/admin/FacilitiesModule';
 import UserDashboard from './pages/user/UserDashboard';
 import UserFacilityCatalogue from './pages/user/UserFacilityCatalogue';
 import Error403 from './pages/Error403';
+import ResourcesPage from './pages/ResourcesPage';
 
 const AppRouter: React.FC = () => {
   return (
@@ -29,6 +30,7 @@ const AppRouter: React.FC = () => {
       >
         <Route index element={<div>Admin Dashboard Home. Navigate to Facilities.</div>} />
         <Route path="facilities" element={<FacilitiesModule />} />
+        <Route path="resources" element={<ResourcesPage />} />
       </Route>
 
       {/* User Routes */}
@@ -42,6 +44,7 @@ const AppRouter: React.FC = () => {
       >
         <Route index element={<UserDashboard />} />
         <Route path="facilities" element={<UserFacilityCatalogue />} />
+        <Route path="resources" element={<ResourcesPage />} />
       </Route>
 
       {/* Fallback */}

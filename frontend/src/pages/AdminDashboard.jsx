@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FiUser, FiLogOut, FiCheckCircle, FiXCircle, FiClock, FiMapPin, FiMail, FiAlertCircle, FiUsers, FiActivity } from "react-icons/fi";
+import { FiUser, FiLogOut, FiCheckCircle, FiXCircle, FiClock, FiMapPin, FiMail, FiAlertCircle, FiUsers, FiActivity, FiRefreshCw } from "react-icons/fi";
 
 const API = "http://localhost:8081";
 
@@ -18,12 +18,20 @@ export default function AdminDashboard() {
   const [rejectReasons, setRejectReasons] = useState({});
 
   const loadData = async () => {
-    const [ticketRes, techRes] = await Promise.all([
-      axios.get(`${API}/api/tickets`),
-      axios.get(`${API}/users?role=TECHNICIAN`).catch(() => ({ data: [] }))
-    ]);
-    setTickets(ticketRes.data);
-    setTechnicians(techRes.data || []);
+    try {
+      const [ticketRes, techRes] = await Promise.all([
+        axios.get(`${API}/api/tickets`),
+        axios.get(`${API}/users?role=TECHNICIAN`).catch(() => ({ data: [] }))
+      ]);
+      setTickets(ticketRes.data || []);
+      setTechnicians(techRes.data || []);
+      console.log('Tickets loaded:', ticketRes.data);
+      console.log('Resolved tickets count:', ticketRes.data?.filter(t => t.status === 'RESOLVED').length);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      setTickets([]);
+      setTechnicians([]);
+    }
   };
 
   useEffect(() => { loadData(); }, []);
@@ -54,8 +62,14 @@ export default function AdminDashboard() {
   };
 
   const closeTicket = async (ticketId) => {
-    await axios.patch(`${API}/api/tickets/${ticketId}/close?role=${user.role}`);
-    await loadData();
+    try {
+      await axios.patch(`${API}/api/tickets/${ticketId}/close?role=${user.role}`);
+      console.log('Ticket closed, reloading data...');
+      await loadData();
+    } catch (error) {
+      console.error('Error closing ticket:', error);
+      alert('Failed to close ticket');
+    }
   };
 
   return (
@@ -105,6 +119,15 @@ export default function AdminDashboard() {
           <div className="stat-content">
             <div className="stat-number">{tickets.filter(t => t.status === 'RESOLVED').length}</div>
             <div className="stat-label">Resolved</div>
+          </div>
+        </div>
+        <div className="stat-card refresh-card">
+          <button className="refresh-btn" onClick={loadData} title="Refresh data">
+            <FiRefreshCw />
+          </button>
+          <div className="stat-content">
+            <div className="stat-label">Last Updated</div>
+            <div className="stat-time">{new Date().toLocaleTimeString()}</div>
           </div>
         </div>
         <div className="stat-card">

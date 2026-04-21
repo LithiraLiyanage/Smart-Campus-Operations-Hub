@@ -1,5 +1,6 @@
 package com.smartcampus.backend.model;
 
 public enum ResourceType {
-    LECTURE_HALL, LAB, MEETING_ROOM, EQUIPMENT
+    // Assignment spec: rooms, labs, equipment
+    ROOM, LAB, EQUIPMENT
 }

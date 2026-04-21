@@ -36,6 +36,20 @@ public class JwtUtil {
                 .getSubject();
     }
 
+    /**
+     * Extract role claim from JWT.
+     * Expected values: "ADMIN" or "USER".
+     */
+    public String extractRole(String token) {
+        Object role = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role");
+        return role == null ? null : role.toString();
+    }
+
     // ✅ Validate Token
     public boolean validateToken(String token) {
         try {

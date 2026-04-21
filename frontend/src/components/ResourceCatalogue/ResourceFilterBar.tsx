@@ -1,7 +1,8 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
 
-const RESOURCE_TYPES = ['LECTURE_HALL', 'LAB', 'MEETING_ROOM', 'EQUIPMENT'];
+// Aligned with backend ResourceType enum (ROOM, LAB, EQUIPMENT)
+const RESOURCE_TYPES = ['ROOM', 'LAB', 'EQUIPMENT'];
 const RESOURCE_STATUSES = ['ACTIVE', 'OUT_OF_SERVICE'];
 
 const ResourceFilterBar = ({ onFilterChange, initialFilters }) => {

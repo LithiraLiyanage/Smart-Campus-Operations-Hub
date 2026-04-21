@@ -1,7 +1,8 @@
-import axios from 'axios';
+import axiosClient from '../api/axiosClient';
 
 /**
  * API service for campus resources.
+ * Uses the shared axios client so JWT + proxy (/api → backend) work in dev and consistent deployments.
  * Filtering logic: we only send non-empty filter values as query params.
  */
 
@@ -24,13 +25,6 @@ export interface ResourceFilters {
   status?: ResourceStatus;
 }
 
-const api = axios.create({
-  baseURL: 'http://localhost:8080/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
 function buildParams(filters: ResourceFilters = {}) {
   const params: Record<string, string | number> = {};
 
@@ -47,7 +41,7 @@ export const resourceService = {
    * GET /resources?type=...&capacity=...&location=...&status=...
    */
   async getResources(filters: ResourceFilters): Promise<Resource[]> {
-    const res = await api.get<Resource[]>('/resources', { params: buildParams(filters) });
+    const res = await axiosClient.get<Resource[]>('/resources', { params: buildParams(filters) });
     return res.data;
   },
 
@@ -55,7 +49,7 @@ export const resourceService = {
    * POST /resources
    */
   async createResource(payload: Omit<Resource, 'id'>): Promise<Resource> {
-    const res = await api.post<Resource>('/resources', payload);
+    const res = await axiosClient.post<Resource>('/resources', payload);
     return res.data;
   },
 
@@ -63,7 +57,7 @@ export const resourceService = {
    * PUT /resources/{id}
    */
   async updateResource(id: string | number, payload: Partial<Resource>): Promise<Resource> {
-    const res = await api.put<Resource>(`/resources/${id}`, payload);
+    const res = await axiosClient.put<Resource>(`/resources/${id}`, payload);
     return res.data;
   },
 
@@ -71,7 +65,7 @@ export const resourceService = {
    * DELETE /resources/{id}
    */
   async deleteResource(id: string | number): Promise<void> {
-    await api.delete(`/resources/${id}`);
+    await axiosClient.delete(`/resources/${id}`);
   },
 };
 

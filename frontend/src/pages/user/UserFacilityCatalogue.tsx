@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosClient from '../../api/axiosClient';
 import ResourceCard from '../../components/ResourceCatalogue/ResourceCard';
 import ResourceFilterBar from '../../components/ResourceCatalogue/ResourceFilterBar';
 import LoadingSkeleton from '../../components/ResourceCatalogue/LoadingSkeleton';
@@ -21,7 +21,7 @@ const UserFacilityCatalogue = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('http://localhost:8080/api/resources');
+      const response = await axiosClient.get('/resources');
       setResources(response.data || []);
     } catch (err) {
       console.error("Error fetching resources:", err);

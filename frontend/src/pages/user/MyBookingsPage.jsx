@@ -240,8 +240,10 @@ export default function MyBookingsPage() {
               <h3>No bookings found for "{currentUserId}"</h3>
               <p>Submit a new booking request to get started</p>
             </div>
-          ) : (
-            <table className="bookings-table">
+          ) : 
+          (
+    <div className="table-scroll-wrapper">
+  <table className="bookings-table">
               <thead>
                 <tr>
                   <th>Resource</th>
@@ -249,64 +251,72 @@ export default function MyBookingsPage() {
                   <th>Schedule</th>
                   <th>Attendees</th>
                   <th>Contact</th>
+                  <th>Special Requirements</th>
                   <th>Status</th>
+                  <th>Remarks</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {bookings.map((b) => (
                   <tr key={b.id}>
-                    <td>
-                      <div className="resource-id">{b.resourceId}</div>
-                      <div className="time-sub">{b.resourceName}</div>
-                    </td>
-                    <td>{b.purpose}</td>
-                    <td>
-                      <div className="time-main">
-                        {new Date(b.startTime).toLocaleDateString()}
-                      </div>
-                      <div className="time-sub">
-                        {new Date(b.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} →{" "}
-                        {new Date(b.endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                      </div>
-                    </td>
-                    <td>{b.expectedAttendees}</td>
-                    <td>{b.contactNumber || "—"}</td>
-                    <td>
-                      <StatusBadge status={b.status} />
-                      {b.adminReason && (
-                        <div style={{ fontSize: 11, color: "#ef4444", marginTop: 3 }}>
-                          {b.adminReason}
-                        </div>
-                      )}
-                    </td>
-                    <td>
-                      <div className="row-actions">
-                        {/* Update — only for PENDING */}
-                        {b.status === "PENDING" && (
-                          <button className="update-btn"
-                            onClick={() => handleEditOpen(b)}>
-                            ✏ Update
-                          </button>
-                        )}
-                        {/* Cancel — only for APPROVED */}
-                        {b.status === "APPROVED" && (
-                          <button className="cancel-btn"
-                            onClick={() => handleCancel(b.id)}>
-                            Cancel
-                          </button>
-                        )}
-                        {/* Delete — always visible */}
-                        <button className="delete-row-btn"
-                          onClick={() => handleDelete(b.id)}>
-                          🗑 Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+  <td>
+    <div className="resource-id">{b.resourceId}</div>
+    <div className="time-sub">{b.resourceName}</div>
+  </td>
+  <td>{b.purpose}</td>
+  <td>
+    <div className="time-main">
+      {new Date(b.startTime).toLocaleDateString()}
+    </div>
+    <div className="time-sub">
+      {new Date(b.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} →{" "}
+      {new Date(b.endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+    </div>
+  </td>
+  <td>{b.expectedAttendees}</td>
+  <td>{b.contactNumber || "—"}</td>
+  <td>
+    {b.specialRequirements
+      ? <span className="special-req-text">{b.specialRequirements}</span>
+      : <span className="time-sub">—</span>
+    }
+  </td>
+  <td>
+    <StatusBadge status={b.status} />
+  </td>
+  <td>
+    {b.status === "REJECTED" && b.adminReason ? (
+      <span className="remarks-text">{b.adminReason}</span>
+    ) : (
+      <span className="time-sub">—</span>
+    )}
+  </td>
+  <td>
+    <div className="row-actions">
+      {b.status === "PENDING" && (
+        <button className="update-btn"
+          onClick={() => handleEditOpen(b)}>
+          ✏ Update
+        </button>
+      )}
+      {b.status === "APPROVED" && (
+        <button className="cancel-btn"
+          onClick={() => handleCancel(b.id)}>
+          Cancel
+        </button>
+      )}
+      <button className="delete-row-btn"
+        onClick={() => handleDelete(b.id)}>
+        🗑 Delete
+      </button>
+    </div>
+  </td>
+</tr>
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       </div>

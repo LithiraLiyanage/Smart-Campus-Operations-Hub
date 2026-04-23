@@ -39,6 +39,26 @@ It integrates:
 
 ---
 
+## 🚀 Project Overview
+
+<p align="center">
+  <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop" width="700"/>
+</p>
+
+<p align="center">
+  <b>💻 A modern platform to manage campus facilities, bookings, and maintenance workflows efficiently</b>
+</p>
+
+---
+
+Smart Campus Operations Hub is a production-inspired web application designed to centralize and streamline university operations into a single intelligent system.
+
+It provides a seamless experience for managing facilities, handling bookings, tracking maintenance requests, and delivering real-time notifications with secure role-based access.
+
+✨ Built with scalability, performance, and real-world architecture in mind.
+
+---
+
 ## 🎯 Key Features
 
 ### 🏢 Facilities & Assets Management

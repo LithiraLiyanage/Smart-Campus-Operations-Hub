@@ -42,20 +42,20 @@ It integrates:
 ## 🚀 Project Overview
 
 <p align="center">
-  <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop" width="700"/>
+  <img src="https://images.unsplash.com/photo-1605902711622-cfb43c4437d1?q=80&w=1200&auto=format&fit=crop" width="700"/>
 </p>
 
 <p align="center">
-  <b>💻 A modern platform to manage campus facilities, bookings, and maintenance workflows efficiently</b>
+  <b>💻 Smart Campus Operations Hub – A modern system for managing campus workflows efficiently</b>
 </p>
 
 ---
 
-Smart Campus Operations Hub is a production-inspired web application designed to centralize and streamline university operations into a single intelligent system.
+Smart Campus Operations Hub is a production-inspired web application designed to streamline university operations through a centralized platform.
 
-It provides a seamless experience for managing facilities, handling bookings, tracking maintenance requests, and delivering real-time notifications with secure role-based access.
+It enables efficient management of facilities, bookings, maintenance workflows, and real-time notifications with secure role-based access.
 
-✨ Built with scalability, performance, and real-world architecture in mind.
+✨ Built using Spring Boot and React with scalable architecture and clean design principles.
 
 ---
 

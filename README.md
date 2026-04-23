@@ -42,7 +42,7 @@ It integrates:
 ## 🚀 Project Overview
 
 <p align="center">
-  <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200&auto=format&fit=crop" width="700"/>
+  <img src="https://media.giphy.com/media/qgQUggAC3Pfv687qPC/giphy.gif" width="700"/>
 </p>
 
 ---

@@ -42,11 +42,7 @@ It integrates:
 ## 🚀 Project Overview
 
 <p align="center">
-  <img src="https://images.unsplash.com/photo-1605902711622-cfb43c4437d1?q=80&w=1200&auto=format&fit=crop" width="700"/>
-</p>
-
-<p align="center">
-  <b>💻 Smart Campus Operations Hub – A modern system for managing campus workflows efficiently</b>
+  <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200&auto=format&fit=crop" width="700"/>
 </p>
 
 ---
